@@ -53,7 +53,7 @@ export default function Header({ history }) {
     <HeaderDarkButton />
     {user ? (
       <>
-        <HeaderNavLink  to="/createjob">contract</HeaderNavLink>
+        {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
         <HeaderUsername username={user.username}/>
         <HeaderNavLink to="/" onClick={mutation.mutate}>
           log out
