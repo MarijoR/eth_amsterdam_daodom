@@ -54,6 +54,7 @@ export default function Header({ history }) {
     {user ? (
       <>
         {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
+        <HeaderNavLink  to="/multisig">My Gnosis Safe</HeaderNavLink>
         <HeaderUsername username={user.username}/>
         <HeaderNavLink to="/" onClick={mutation.mutate}>
           log out

@@ -2,8 +2,15 @@ import { Button, Card, DatePicker, Divider, Input, List, Progress, Slider, Spin,
 import React, { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 import SafeServiceClient from '@gnosis.pm/safe-service-client'
-import { Address, Balance, EtherInput, AddressInput } from "../components";
-import { usePoller, useLocalStorage, useBalance, useSafeSdk } from "../hooks";
+import Address from "../components/Address";
+import Balance from "../components/Balance";
+import EtherInput from "../components/EtherInput";
+import AddressInput from "../components/AddressInput";
+import usePoller from "../hooks/Poller";
+import useLocalStorage from "../hooks/LocalStorage";
+import useBalance from "../hooks/Balance";
+import useSafeSdk from "../hooks/SafeSdk";
+
 import { EthSignSignature } from './EthSignSignature'
 import WalletConnect from "@walletconnect/client";
 
@@ -494,7 +501,6 @@ export default function GnosisStarterView({
           })
         }
       </div>
-      <div style={{padding:64,margin:64}}><a href="https://github.com/austintgriffith/scaffold-eth/tree/gnosis-starter-kit" target="_blank">🏗</a></div>
     </div>
   );
 }
