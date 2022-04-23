@@ -4,6 +4,8 @@ import Post from "components/Post";
 import DeleteButton from "components/shared/DeleteButton";
 import ConnectButton from "components/shared/ConnectButton";
 import StreamButton from "components/shared/StreamButton";
+import UpdateStreamButton from "components/shared/UpdateStreamButton";
+import DeleteStreamButton from "components/shared/DeleteStreamButton";
 import Empty from "components/shared/Empty";
 import LoadingIndicatorBox from "components/shared/LoadingIndicator/Box";
 import { deletePost, getCommentsByPostId, getPost } from "lib/firebase";
@@ -84,6 +86,62 @@ async function createNewFlow(recipient, flowRate) {
     console.error(error);
   }
 }
+
+async function updateExistingFlow(recipient, flowRate) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+  const signer = provider.getSigner();
+
+  const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  const sf = await Framework.create({
+    chainId: Number(chainId),
+    provider: provider
+  });
+
+  const DAIxContract = await sf.loadSuperToken("fDAIx");
+  const DAIx = DAIxContract.address;
+
+  try {
+    const updateFlowOperation = sf.cfaV1.updateFlow({
+      flowRate: flowRate,
+      receiver: recipient,
+      superToken: DAIx
+      // userData?: string
+    });
+    const result = await updateFlowOperation.exec(signer);
+    console.log(result);
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function deleteFlow(currentAccount, recipient) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  const sf = await Framework.create({
+    chainId: Number(chainId),
+    provider: provider
+  });
+
+  const DAIxContract = await sf.loadSuperToken("fDAIx");
+  const DAIx = DAIxContract.address;
+
+  try {
+    const deleteFlowOperation = sf.cfaV1.deleteFlow({
+      sender: currentAccount,
+      receiver: recipient,
+      superToken: DAIx
+      // userData?: string
+    });
+
+    await deleteFlowOperation.exec(signer);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 
 export default function PostDetail() {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -189,7 +247,7 @@ export default function PostDetail() {
     return (
       <Wrapper round={!user}>
         <span>Recipient: {address} Flow Rate: {flowrate}</span>
-        {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />}
+        {/* {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />} */}
         <StreamButton
             onClick={() => {
               setIsButtonLoading(true);
@@ -199,6 +257,24 @@ export default function PostDetail() {
               }, 1000);
             }}
           />
+          {/* <UpdateStreamButton
+          onClick={() => {
+            setIsButtonLoading(true);
+            updateExistingFlow(recipient, flowRate);
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        /> */}
+        <DeleteStreamButton
+          onClick={() => {
+            setIsButtonLoading(true);
+            deleteFlow(currentAccount, recipient);
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        />
       </Wrapper>
     );
   }
