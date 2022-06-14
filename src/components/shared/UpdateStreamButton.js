@@ -10,9 +10,11 @@ const Button = styled.button`
   cursor: pointer;
   font-size: 13px;
   color: ${(props) => props.theme.normalText};
-  margin-left: auto;
+  margin-left: 10px;
 `;
 
-const UpdateStreamButton = (props) => <Button onClick={props.onClick}>Update Your Stream</Button>;
+const UpdateStreamButton = (props) => (
+  <Button onClick={props.onClick}>Update Your Stream</Button>
+);
 
 export default UpdateStreamButton;

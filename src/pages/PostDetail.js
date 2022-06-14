@@ -4,6 +4,7 @@ import Post from "components/Post";
 import DeleteButton from "components/shared/DeleteButton";
 import ConnectButton from "components/shared/ConnectButton";
 import StreamButton from "components/shared/StreamButton";
+import UpdateStreamForm from "components/shared/UpdateStreamForm";
 import UpdateStreamButton from "components/shared/UpdateStreamButton";
 import DeleteStreamButton from "components/shared/DeleteStreamButton";
 import Empty from "components/shared/Empty";
@@ -18,7 +19,14 @@ import styled from "styled-components/macro";
 
 import React, { useState, useEffect } from "react";
 import { Framework } from "@superfluid-finance/sdk-core";
-import { Button, Spinner, Card } from "react-bootstrap";
+import {
+  Button,
+  Spinner,
+  Card,
+  Form,
+  FormGroup,
+  FormControl,
+} from "react-bootstrap";
 import "../components/SuperFluid/createFlow.css";
 import { ethers } from "ethers";
 
@@ -87,7 +95,6 @@ async function updateExistingFlow(recipient, flowRate) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = provider.getSigner();
-  console.log("Hi: ", signer);
 
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
   const sf = await Framework.create({
@@ -144,6 +151,8 @@ export default function PostDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [flowRate, setFlowRate] = useState("");
   const [flowRateDisplay, setFlowRateDisplay] = useState("");
+  const [newFlowRate, setNewFlowRate] = useState("");
+  const [newFlowRateDisplay, setNewFlowRateDisplay] = useState("");
   const [recipient, setRecipient] = useState("");
 
   const connectWallet = async () => {
@@ -264,7 +273,7 @@ export default function PostDetail() {
             }, 1000);
           }}
         />
-        <UpdateStreamButton
+        {/*   <UpdateStreamButton
           onClick={() => {
             setIsButtonLoading(true);
             updateExistingFlow(recipient, flowRate);
@@ -272,7 +281,7 @@ export default function PostDetail() {
               setIsButtonLoading(false);
             }, 1000);
           }}
-        />
+        /> */}
         <DeleteStreamButton
           onClick={() => {
             setIsButtonLoading(true);
@@ -286,40 +295,67 @@ export default function PostDetail() {
     );
   }
 
-  function UpdateStream({ user, postId, post }) {
-    const { author, address, flowrate } = post;
-    const history = useHistory();
-    setFlowRate(flowrate);
-    setRecipient(address);
+  function UpdateStream({ user }) {
+    const handleFlowRateChange = (e) => {
+      setNewFlowRate(() => ([e.target.name] = e.target.value));
+      // if (typeof Number(flowRate) === "number") {
+      let newFlowRateDisplay = calculateFlowRate(e.target.value);
+      setNewFlowRateDisplay(newFlowRateDisplay.toString());
+      // setFlowRateDisplay(() => calculateFlowRate(e.target.value));
+      // }
+    };
 
-    const mutation = useMutation(deletePost, {
-      onSuccess: () => {
-        history.replace("/");
-        toast.success("Post deleted");
-      },
-    });
-
-    const isAuthor = author.uid === user?.uid;
-
-    if (
-      typeof Number(flowrate) !== "number" ||
-      isNaN(Number(flowrate)) === true
-    ) {
-      alert("You can only calculate a flowRate based on a number");
-      return;
-    } else if (typeof Number(flowrate) === "number") {
-      if (Number(flowrate) === 0) {
-        return 0;
+    function calculateFlowRate(amount) {
+      if (
+        typeof Number(amount) !== "number" ||
+        isNaN(Number(amount)) === true
+      ) {
+        alert("You can only calculate a flowRate based on a number");
+        return;
+      } else if (typeof Number(amount) === "number") {
+        if (Number(amount) === 0) {
+          return 0;
+        }
+        const amountInWei = ethers.BigNumber.from(amount);
+        const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+        const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+        return calculatedFlowRate;
       }
-      const amountInWei = ethers.BigNumber.from(flowrate);
-      const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-      const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
-      setFlowRateDisplay(calculatedFlowRate);
     }
 
     return (
       <Wrapper round={!user}>
-        <span>Your flow will be equal to: {flowRateDisplay} DAIx/month</span>
+        <span>
+          <p> Enter new flowRate</p>
+        </span>
+        <span>
+          <Form style={{ paddingInline: "10px" }}>
+            <FormControl
+              name="newFlowRate"
+              value={newFlowRate}
+              onChange={handleFlowRateChange}
+              placeholder="flowRate in wei/second"
+              autoFocus
+            ></FormControl>
+          </Form>
+        </span>
+        <span>Your flow will be equal to: {newFlowRateDisplay} DAIx/month</span>
+
+        <b>
+          {Number(newFlowRate) > Number(flowRate) ? (
+            <UpdateStreamButton
+              onClick={() => {
+                setIsButtonLoading(true);
+                updateExistingFlow(recipient, newFlowRate);
+                setTimeout(() => {
+                  setIsButtonLoading(false);
+                }, 1000);
+              }}
+            />
+          ) : (
+            <></>
+          )}
+        </b>
       </Wrapper>
     );
   }
