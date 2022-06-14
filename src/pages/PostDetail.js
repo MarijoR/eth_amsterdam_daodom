@@ -4,7 +4,6 @@ import Post from "components/Post";
 import DeleteButton from "components/shared/DeleteButton";
 import ConnectButton from "components/shared/ConnectButton";
 import StreamButton from "components/shared/StreamButton";
-import UpdateStreamForm from "components/shared/UpdateStreamForm";
 import UpdateStreamButton from "components/shared/UpdateStreamButton";
 import DeleteStreamButton from "components/shared/DeleteStreamButton";
 import Empty from "components/shared/Empty";
