@@ -18,11 +18,7 @@ import styled from "styled-components/macro";
 
 import React, { useState, useEffect } from "react";
 import { Framework } from "@superfluid-finance/sdk-core";
-import {
-  Button,
-  Spinner,
-  Card
-} from "react-bootstrap";
+import { Button, Spinner, Card } from "react-bootstrap";
 import "../components/SuperFluid/createFlow.css";
 import { ethers } from "ethers";
 
@@ -64,7 +60,7 @@ async function createNewFlow(recipient, flowRate) {
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
   const sf = await Framework.create({
     chainId: Number(chainId),
-    provider: provider
+    provider: provider,
   });
 
   const DAIxContract = await sf.loadSuperToken("fDAIx");
@@ -74,7 +70,7 @@ async function createNewFlow(recipient, flowRate) {
     const createFlowOperation = sf.cfaV1.createFlow({
       receiver: recipient,
       flowRate: flowRate,
-      superToken: DAIx
+      superToken: DAIx,
       // userData?: string
     });
 
@@ -91,11 +87,12 @@ async function updateExistingFlow(recipient, flowRate) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = provider.getSigner();
+  console.log("Hi: ", signer);
 
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
   const sf = await Framework.create({
     chainId: Number(chainId),
-    provider: provider
+    provider: provider,
   });
 
   const DAIxContract = await sf.loadSuperToken("fDAIx");
@@ -105,12 +102,12 @@ async function updateExistingFlow(recipient, flowRate) {
     const updateFlowOperation = sf.cfaV1.updateFlow({
       flowRate: flowRate,
       receiver: recipient,
-      superToken: DAIx
+      superToken: DAIx,
       // userData?: string
     });
     const result = await updateFlowOperation.exec(signer);
     console.log(result);
-
+    console.log("Congrats - you've just updated a money stream!");
   } catch (error) {
     console.error(error);
   }
@@ -122,7 +119,7 @@ async function deleteFlow(currentAccount, recipient) {
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
   const sf = await Framework.create({
     chainId: Number(chainId),
-    provider: provider
+    provider: provider,
   });
 
   const DAIxContract = await sf.loadSuperToken("fDAIx");
@@ -132,7 +129,7 @@ async function deleteFlow(currentAccount, recipient) {
     const deleteFlowOperation = sf.cfaV1.deleteFlow({
       sender: currentAccount,
       receiver: recipient,
-      superToken: DAIx
+      superToken: DAIx,
       // userData?: string
     });
 
@@ -142,23 +139,23 @@ async function deleteFlow(currentAccount, recipient) {
   }
 }
 
-
 export default function PostDetail() {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [currentAccount, setCurrentAccount] = useState("");
   const [flowRate, setFlowRate] = useState("");
+  const [flowRateDisplay, setFlowRateDisplay] = useState("");
   const [recipient, setRecipient] = useState("");
 
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
-  
+
       if (!ethereum) {
         alert("Get MetaMask!");
         return;
       }
       const accounts = await ethereum.request({
-        method: "eth_requestAccounts"
+        method: "eth_requestAccounts",
       });
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
@@ -170,17 +167,17 @@ export default function PostDetail() {
       console.log(error);
     }
   };
-  
+
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
-  
+
     if (!ethereum) {
       console.log("Make sure you have metamask!");
       return;
     } else {
       console.log("We have the ethereum object", ethereum);
     }
-  
+
     const accounts = await ethereum.request({ method: "eth_accounts" });
     const chain = await window.ethereum.request({ method: "eth_chainId" });
     let chainId = chain;
@@ -197,7 +194,7 @@ export default function PostDetail() {
       console.log("No authorized account found");
     }
   };
-  
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -206,7 +203,7 @@ export default function PostDetail() {
   usePostViewCount(postId);
   const user = useStore((s) => s.user);
   const { data: post, isLoading } = useQuery(["post", postId], () =>
-    getPost(postId),
+    getPost(postId)
   );
 
   if (isLoading) return <LoadingIndicatorBox />;
@@ -216,6 +213,7 @@ export default function PostDetail() {
     <>
       <PostDetailPost post={post} />
       <ContractDefinition postId={postId} post={post} user={user} />
+      <UpdateStream postId={postId} post={post} user={user} />
       <PostDetailInfoBar postId={postId} post={post} user={user} />
       {user && <CommentForm postId={postId} />}
       <PostDetailCommentSection postId={postId} />
@@ -232,8 +230,8 @@ export default function PostDetail() {
   function ContractDefinition({ user, postId, post }) {
     const { author, address, flowrate } = post;
     const history = useHistory();
-    setFlowRate(flowrate)
-    setRecipient(address)
+    setFlowRate(flowrate);
+    setRecipient(address);
 
     const mutation = useMutation(deletePost, {
       onSuccess: () => {
@@ -241,23 +239,32 @@ export default function PostDetail() {
         toast.success("Post deleted");
       },
     });
-  
+
+    const amountInWei = ethers.BigNumber.from(flowrate);
+    const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+    const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+    setFlowRateDisplay(calculatedFlowRate);
+
     const isAuthor = author.uid === user?.uid;
-  
+
     return (
       <Wrapper round={!user}>
-        <span>Recipient: {address} Flow Rate: {flowrate}</span>
+        <span>
+          <p>Recipient: {address}</p>
+          <p>Flow Rate: {flowrate}</p>
+          <p>This flow is equal to: {flowRateDisplay} DAIx/month</p>
+        </span>
         {/* {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />} */}
         <StreamButton
-            onClick={() => {
-              setIsButtonLoading(true);
-              createNewFlow(recipient, flowRate);
-              setTimeout(() => {
-                setIsButtonLoading(false);
-              }, 1000);
-            }}
-          />
-          {/* <UpdateStreamButton
+          onClick={() => {
+            setIsButtonLoading(true);
+            createNewFlow(recipient, flowRate);
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        />
+        <UpdateStreamButton
           onClick={() => {
             setIsButtonLoading(true);
             updateExistingFlow(recipient, flowRate);
@@ -265,7 +272,7 @@ export default function PostDetail() {
               setIsButtonLoading(false);
             }, 1000);
           }}
-        /> */}
+        />
         <DeleteStreamButton
           onClick={() => {
             setIsButtonLoading(true);
@@ -278,7 +285,45 @@ export default function PostDetail() {
       </Wrapper>
     );
   }
-  
+
+  function UpdateStream({ user, postId, post }) {
+    const { author, address, flowrate } = post;
+    const history = useHistory();
+    setFlowRate(flowrate);
+    setRecipient(address);
+
+    const mutation = useMutation(deletePost, {
+      onSuccess: () => {
+        history.replace("/");
+        toast.success("Post deleted");
+      },
+    });
+
+    const isAuthor = author.uid === user?.uid;
+
+    if (
+      typeof Number(flowrate) !== "number" ||
+      isNaN(Number(flowrate)) === true
+    ) {
+      alert("You can only calculate a flowRate based on a number");
+      return;
+    } else if (typeof Number(flowrate) === "number") {
+      if (Number(flowrate) === 0) {
+        return 0;
+      }
+      const amountInWei = ethers.BigNumber.from(flowrate);
+      const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+      const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+      setFlowRateDisplay(calculatedFlowRate);
+    }
+
+    return (
+      <Wrapper round={!user}>
+        <span>Your flow will be equal to: {flowRateDisplay} DAIx/month</span>
+      </Wrapper>
+    );
+  }
+
   function PostDetailInfoBar({ user, postId, post }) {
     const { author, views, upvotePercentage } = post;
     const history = useHistory();
@@ -288,7 +333,7 @@ export default function PostDetail() {
         toast.success("Post deleted");
       },
     });
-  
+
     function CreateButton({ isLoading, children, ...props }) {
       return (
         <Button variant="success" className="button" {...props}>
@@ -296,9 +341,9 @@ export default function PostDetail() {
         </Button>
       );
     }
-  
+
     const isAuthor = author.uid === user?.uid;
-  
+
     return (
       <Wrapper round={!user}>
         <span>{views} views</span>
@@ -316,15 +361,14 @@ export default function PostDetail() {
         )}
       </Wrapper>
     );
-  }  
+  }
 
   function PostDetailCommentSection({ postId }) {
     const { data: comments, isLoading } = useQuery(["comments", postId], () =>
       getCommentsByPostId(postId)
     );
-  
+
     if (isLoading || !comments?.length) return <Empty comments />;
     return <CommentList comments={comments} />;
   }
 }
-
