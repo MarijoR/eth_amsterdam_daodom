@@ -1,13 +1,12 @@
 import CommentForm from "components/CommentForm";
 import CommentList from "components/CommentList";
 import Post from "components/Post";
-import DeleteButton from "components/shared/DeleteButton";
 import ConnectButton from "components/shared/ConnectButton";
-import StreamButton from "components/shared/StreamButton";
-import UpdateStreamButton from "components/shared/UpdateStreamButton";
 import DeleteStreamButton from "components/shared/DeleteStreamButton";
 import Empty from "components/shared/Empty";
 import LoadingIndicatorBox from "components/shared/LoadingIndicator/Box";
+import StreamButton from "components/shared/StreamButton";
+import UpdateStreamButton from "components/shared/UpdateStreamButton";
 import { deletePost, getCommentsByPostId, getPost } from "lib/firebase";
 import { usePostViewCount } from "lib/hooks";
 import toast from "react-hot-toast";
@@ -15,19 +14,11 @@ import { useMutation, useQuery } from "react-query";
 import { useHistory, useParams } from "react-router";
 import useStore from "store";
 import styled from "styled-components/macro";
-
-import React, { useState, useEffect } from "react";
 import { Framework } from "@superfluid-finance/sdk-core";
-import {
-  Button,
-  Spinner,
-  Card,
-  Form,
-  FormGroup,
-  FormControl,
-} from "react-bootstrap";
-import "../components/SuperFluid/createFlow.css";
 import { ethers } from "ethers";
+import { useEffect, useState } from "react";
+import { Button, Card, Form, FormControl, Spinner } from "react-bootstrap";
+import "../components/SuperFluid/createFlow.css";
 
 const Wrapper = styled.div`
   display: flex;
@@ -341,7 +332,7 @@ export default function PostDetail() {
         <span>Your flow will be equal to: {newFlowRateDisplay} DAIx/month</span>
 
         <b>
-          {Number(newFlowRate) > Number(flowRate) ? (
+          {newFlowRate !== "" ? (
             <UpdateStreamButton
               onClick={() => {
                 setIsButtonLoading(true);
