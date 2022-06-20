@@ -9,20 +9,19 @@ import Signup from "pages/Signup";
 import { Route, Switch } from "react-router-dom";
 
 export default function App() {
-  useAuthUser()
+  //useAuthUser()
 
-  return <>
-  <Route component={Header} />
-  <Switch>
-    <Route path="/login" component={Login} />
-    <Route path="/signup" component={Signup} />
-    {/* <Route path="/createjob" component={CreateFlow} /> */}
-    <Route path="/multisig" component={MultiSigGnosis} />
-    <Route path="/createpost" component={CreatePost} />
-    <Route path="/" component={Home} />
-
-
-
-  </Switch>
-  </>;
+  return (
+    <>
+      <Route component={Header} />
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={Signup} />
+        {/* <Route path="/createjob" component={CreateFlow} /> */}
+        <Route path="/multisig" component={MultiSigGnosis} />
+        <Route path="/createpost" component={CreatePost} />
+        <Route path="/" component={Home} />
+      </Switch>
+    </>
+  );
 }

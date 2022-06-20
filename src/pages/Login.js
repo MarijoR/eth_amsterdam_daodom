@@ -22,6 +22,7 @@ export default function Login({ history }) {
     (s) => [s.setUser, s.resetUser],
     shallow
   );
+  const torus = new Torus({});
 
   const {
     register,
@@ -55,7 +56,6 @@ export default function Login({ history }) {
     // mutation.mutate({ email, password });
     //e.preventDefault();
 
-    const torus = new Torus({});
     await torus.init({
       enableLogging: false,
     });
@@ -71,22 +71,22 @@ export default function Login({ history }) {
     } else {
       history.replace("/");
       toast.success("Login successful!");
-      setUser(web3);
-      if (window.ethereum) {
-        window.ethereum
-          .request({ method: "eth_requestAccounts" })
-          .then((result) => {
-            setAccount(result[0]);
-            console.log(result[0]);
-          })
-          .catch((error) => {
-            console.log(error.message);
-          });
-      }
+      addUser();
     }
     /* const address = (await web3.eth.getAccounts())[0];
     const balance = await web3.eth.getBalance(address);
-    setAccount({ address, balance }); */
+    setAccount({ address, balance }); 
+    */
+  }
+
+  async function addUser() {
+    try {
+      const userInfo = await torus.getUserInfo();
+      setUser(userInfo);
+      console.log("userInfo: ", userInfo);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (
