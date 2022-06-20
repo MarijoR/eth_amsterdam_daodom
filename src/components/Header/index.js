@@ -7,7 +7,8 @@ import useStore from "store";
 import { useMutation } from "react-query";
 import { logOut } from "lib/firebase";
 import toast from "react-hot-toast";
-import shallow from "zustand/shallow"
+import shallow from "zustand/shallow";
+import Torus from "@toruslabs/torus-embed";
 
 const Wrapper = styled.header`
   position: sticky;
@@ -34,8 +35,10 @@ const Wrapper = styled.header`
 `;
 
 export default function Header({ history }) {
-  const [user, resetUser] = useStore(s => [s.user, s.resetUser], shallow);
-  const mutation = useMutation(logOut, {
+  const [user, resetUser] = useStore((s) => [s.user, s.resetUser], shallow);
+  const torus = new Torus({});
+
+  /*  const mutation = useMutation(logOut, {
     onSuccess: () => {
       resetUser()
       history.push('/login')
@@ -46,26 +49,47 @@ export default function Header({ history }) {
     onError: () => {
       toast.error('Error logging out')
     }
-  });
+  }); */
 
-  return <Wrapper>
-    <HeaderLogo />
-    <HeaderDarkButton />
-    {user ? (
-      <>
-        {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
-        <HeaderNavLink  to="/multisig">My Gnosis Safe</HeaderNavLink>
-        <HeaderUsername username={user.username}/>
-        <HeaderNavLink to="/" onClick={mutation.mutate}>
+  async function logout() {
+    try {
+      const torus = new Torus({});
+      await torus.init({
+        enableLogging: false,
+      });
+      await torus.logout();
+      resetUser();
+      history.push("/login");
+      toast("Logged Out", {
+        icon: "bye",
+      });
+    } catch (error) {
+      toast.error("Error logging out");
+    }
+  }
+
+  return (
+    <Wrapper>
+      <HeaderLogo />
+      <HeaderDarkButton />
+      {user ? (
+        <>
+          {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
+          <HeaderNavLink to="/multisig">My Gnosis Safe</HeaderNavLink>
+          <HeaderUsername username={user.username} />
+          <HeaderNavLink to="/" onClick={logout}>
+            log out
+          </HeaderNavLink>
+          {/*   <HeaderNavLink to="/" onClick={mutation.mutate}>
           log out
-        </HeaderNavLink>
-      </>
-    ) : (
-      <>
-        <HeaderNavLink  to="/login">log in</HeaderNavLink>
-        <HeaderNavLink  to="/signup">sign up</HeaderNavLink>
-
-      </>
-    )}
-  </Wrapper>;
+        </HeaderNavLink> */}
+        </>
+      ) : (
+        <>
+          <HeaderNavLink to="/login">log in</HeaderNavLink>
+          {/* <HeaderNavLink to="/signup">sign up</HeaderNavLink> */}
+        </>
+      )}
+    </Wrapper>
+  );
 }
