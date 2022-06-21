@@ -346,7 +346,7 @@ export default function GnosisStarterView({
               onChange={setTo}
               ensProvider={mainnetProvider}
               value={to}
-              onChange={setTo}
+              
             />
           </div>
           <div style={{ padding: 4 }}>
