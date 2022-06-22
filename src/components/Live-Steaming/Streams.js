@@ -105,6 +105,14 @@ await axios.post('https://livepeer.com/api/stream', data, {
             >
               Get Your NFT
             </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              //onClick={() => history.push('/getnft')}
+            >
+              Watch Live Streams
+            </Button>
       </Container>
  
   );
