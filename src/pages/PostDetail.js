@@ -1,7 +1,6 @@
 import CommentForm from "components/CommentForm";
 import CommentList from "components/CommentList";
 import Post from "components/Post";
-import DeleteButton from "components/shared/DeleteButton";
 import ConnectButton from "components/shared/ConnectButton";
 import StreamButton from "components/shared/StreamButton";
 import UpdateStreamButton from "components/shared/UpdateStreamButton";
@@ -23,7 +22,6 @@ import {
   Spinner,
   Card,
   Form,
-  FormGroup,
   FormControl,
 } from "react-bootstrap";
 import "../components/SuperFluid/createFlow.css";

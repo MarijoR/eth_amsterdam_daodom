@@ -13,6 +13,9 @@ import useSafeSdk from "../hooks/SafeSdk";
 
 import { EthSignSignature } from './EthSignSignature'
 import WalletConnect from "@walletconnect/client";
+import { Account } from "../components";
+
+import Web3Modal from "web3modal";
 
 const serviceClient = new SafeServiceClient('https://safe-transaction.rinkeby.gnosis.io')
 
@@ -35,8 +38,8 @@ export default function GnosisStarterView({
   const [data, setData] = useState('0x00')
 
   const OWNERS = [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-    "0xa81a6a910FeD20374361B35C451a4a44F86CeD46"
+    "0x9bfB07106c0Ce48B037aFb0757dd1C5eb94b20cA",
+    "0x8Bc34a0823bFF3D1dF739E135aD2e332a9565C1b"
   ]
   const THRESHOLD = 2
 
@@ -346,7 +349,7 @@ export default function GnosisStarterView({
               onChange={setTo}
               ensProvider={mainnetProvider}
               value={to}
-              onChange={setTo}
+              //onChange={setTo}
             />
           </div>
           <div style={{ padding: 4 }}>

@@ -3,6 +3,7 @@ import Post from "components/Post";
 import Sidebar from "components/Sidebar";
 import { Route } from "react-router-dom";
 import styled from "styled-components/macro";
+import GnosisStarterView from "./MultisigGnosis";
 import PostDetail from "./PostDetail";
 import PostList from "./PostList";
 
@@ -34,6 +35,7 @@ export default function Home() {
         <Route exact path='/' component={PostList} />
         <Route exact path='/a/:category' component={PostList} />
         <Route exact path='/u/:username' component={PostList} />
+        <Route exact path='/multisig' component={GnosisStarterView} />
         <Route exact path='/a/:category/:postId' component={PostDetail} />
       </HomeMainSection>
         <Route component={Sidebar} />
