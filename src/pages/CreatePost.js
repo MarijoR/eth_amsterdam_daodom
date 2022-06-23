@@ -15,6 +15,7 @@ import useStore from "store";
 import { useMutation } from "react-query";
 import { createPost, getTimestamp } from "lib/firebase";
 import { ethers } from "ethers";
+import toast from "react-hot-toast";
 
 const postTypes = [
   {
@@ -35,7 +36,6 @@ export default function CreatePost({ history }) {
     formState: { errors },
   } = useForm({ mode: "onBlur" });
   const [type, setType] = useState("text");
-  const [flowRate, setFlowRate] = useState("");
   const [flowRateDisplay, setFlowRateDisplay] = useState("");
   const mutation = useMutation(createPost, {
     onSuccess: ({ category, id }) => {
@@ -44,24 +44,23 @@ export default function CreatePost({ history }) {
   });
 
   const handleFlowRateChange = (e) => {
-    setFlowRate(() => ([e.target.name] = e.target.value));
-    let newFlowRateDisplay = calculateFlowRate(e.target.value);
-    setFlowRateDisplay(newFlowRateDisplay.toString());
+    if (typeof Number(e) !== "number" || isNaN(Number(e)) === true) {
+      toast.error("You can only calculate a flowRate based on a number");
+      console.log("Error");
+    } else {
+      let newFlowRateDisplay = calculateFlowRate(e);
+      setFlowRateDisplay(newFlowRateDisplay.toString());
+    }
   };
 
   function calculateFlowRate(amount) {
-    if (typeof Number(amount) !== "number" || isNaN(Number(amount)) === true) {
-      alert("You can only calculate a flowRate based on a number");
-      return;
-    } else if (typeof Number(amount) === "number") {
-      if (Number(amount) === 0) {
-        return 0;
-      }
-      const amountInWei = ethers.BigNumber.from(amount);
-      const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
-      const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
-      return calculatedFlowRate;
+    if (Number(amount) === 0) {
+      return 0;
     }
+    const amountInWei = ethers.BigNumber.from(amount);
+    const monthlyAmount = ethers.utils.formatEther(amountInWei.toString());
+    const calculatedFlowRate = monthlyAmount * 3600 * 24 * 30;
+    return calculatedFlowRate;
   }
 
   function onSubmit(data) {
@@ -173,10 +172,12 @@ export default function CreatePost({ history }) {
         <Input
           {...register("flowrate", {
             required: "The flow rate is required",
+            onChange: (e) => {
+              handleFlowRateChange(e.target.value);
+            },
           })}
           type="text"
           placeholder="flowrate"
-          onChange={handleFlowRateChange}
         />
         <p style={{ color: "#898989", fontSize: "12px" }}>
           Your flow will be equal to: {"  "}
