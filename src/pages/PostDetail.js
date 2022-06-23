@@ -300,7 +300,7 @@ export default function PostDetail() {
         typeof Number(amount) !== "number" ||
         isNaN(Number(amount)) === true
       ) {
-        alert("You can only calculate a flowRate based on a number");
+        toast.error("You can only calculate a flowRate based on a number");
         return;
       } else if (typeof Number(amount) === "number") {
         if (Number(amount) === 0) {
