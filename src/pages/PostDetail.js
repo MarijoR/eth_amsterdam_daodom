@@ -13,6 +13,7 @@ import {
   getCommentsByPostId,
   getPost,
   startStream,
+  stopStream,
 } from "lib/firebase";
 import { usePostViewCount } from "lib/hooks";
 import toast from "react-hot-toast";
@@ -64,6 +65,7 @@ const PostWrapper = styled.div`
   }
 `;
 
+//----------------CREATE NEW FLOW FUNKTION-------------------
 async function createNewFlow(recipient, flowRate) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -96,6 +98,7 @@ async function createNewFlow(recipient, flowRate) {
   }
 }
 
+//----------------UPDATE EXISTING FLOW FUNKTION-------------------
 async function updateExistingFlow(recipient, flowRate) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -123,10 +126,69 @@ async function updateExistingFlow(recipient, flowRate) {
     console.log("Congrats - you've just updated a money stream!");
   } catch (error) {
     console.error(error);
-    toast.error("Flow does not exist");
+    toast.error("Flow does not exist or not enough available balance");
   }
 }
 
+//----------------READ FUNKTIONS-BALANCE OF-------------------
+async function balanceOf(currentAccount, recipient) {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+  const signer = provider.getSigner();
+
+  const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  const sf = await Framework.create({
+    chainId: Number(chainId),
+    provider: provider,
+  });
+
+  const DAIxContract = await sf.loadSuperToken("fDAIx");
+  const DAIx = DAIxContract.address;
+
+  try {
+    // Read functions
+    const result1 = await sf.cfaV1.getFlow({
+      superToken: DAIx,
+      sender: currentAccount,
+      receiver: recipient,
+      providerOrSigner: signer,
+    });
+
+    const result2 = await sf.cfaV1.getAccountFlowInfo({
+      superToken: DAIx,
+      account: currentAccount,
+      providerOrSigner: signer,
+    });
+
+    const result3 = await sf.cfaV1.getNetFlow({
+      superToken: DAIx,
+      account: currentAccount,
+      providerOrSigner: signer,
+    });
+
+    const result4 = await DAIxContract.balanceOf({
+      account: currentAccount,
+      providerOrSigner: signer,
+    });
+
+    const result5 = await DAIxContract.allowance({
+      owner: recipient,
+      spender: currentAccount,
+      providerOrSigner: signer,
+    });
+
+    //-----TEST----------
+    console.log("getFlow:", result1);
+    console.log("getAccountFlowInfo:", result2);
+    console.log("getNetFlow:", result3);
+    console.log("balanceOf:", result4);
+    console.log("allowance:", result5);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+//----------------DELETE FLOW FUNKTION-------------------
 async function deleteFlow(currentAccount, recipient) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
@@ -147,13 +209,15 @@ async function deleteFlow(currentAccount, recipient) {
       // userData?: string
     });
 
-    await deleteFlowOperation.exec(signer);
+    const result = await deleteFlowOperation.exec(signer);
+    console.log(result);
   } catch (error) {
     console.error(error);
     toast.error("Flow does not exist");
   }
 }
 
+//----------------COMPONENT-------------------
 export default function PostDetail() {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [currentAccount, setCurrentAccount] = useState("");
@@ -237,6 +301,8 @@ export default function PostDetail() {
       <PostDetailCommentSection postId={postId} />
     </>
   );
+
+  //------------------POST DETAILS ---------------------
   function PostDetailPost({ post }) {
     return (
       <PostWrapper>
@@ -245,6 +311,7 @@ export default function PostDetail() {
     );
   }
 
+  //----------------CREATE AND STOP STREAM -------------------
   function ContractDefinition({ user, postId, post }) {
     const { author, address, flowrate } = post;
     const history = useHistory();
@@ -269,11 +336,10 @@ export default function PostDetail() {
       if (currentAccount === "") {
         toast.error("Please connect your wallet");
       } else {
-        console.log(post);
         setIsButtonLoading(true);
         createNewFlow(recipient, flowRate);
         startStream(postId);
-        console.log(startStream(postId));
+        balanceOf(currentAccount, recipient);
         setTimeout(() => {
           setIsButtonLoading(false);
         }, 1000);
@@ -284,9 +350,8 @@ export default function PostDetail() {
         toast.error("Please connect your wallet");
       } else {
         setIsButtonLoading(true);
-
         deleteFlow(currentAccount, recipient);
-
+        stopStream(postId);
         setTimeout(() => {
           setIsButtonLoading(false);
         }, 1000);
@@ -308,6 +373,7 @@ export default function PostDetail() {
     );
   }
 
+  //----------------UPDATE FLOW-------------------
   function UpdateStream({ user }) {
     const handleFlowRateChange = (e) => {
       setNewFlowRate(() => ([e.target.name] = e.target.value));
@@ -373,16 +439,23 @@ export default function PostDetail() {
     );
   }
 
+  //----------------STREAM INFO-------------------
   function InfoStream({ user, post }) {
     return (
       <Wrapper round={!user}>
         <span>
           {post.stream ? <p> Streaming </p> : <p> No stream currently </p>}
         </span>
+        <UpdateStreamButton
+          onClick={() => {
+            balanceOf(currentAccount, recipient);
+          }}
+        />
       </Wrapper>
     );
   }
 
+  //------------DETAIL BAR AND CONNECT BUTTON--------------
   function PostDetailInfoBar({ user, postId, post }) {
     const { author, views, upvotePercentage } = post;
     const history = useHistory();
@@ -407,21 +480,25 @@ export default function PostDetail() {
       <Wrapper round={!user}>
         <span>{views} views</span>
         <span>&nbsp;|&nbsp;</span>
-        <span>{upvotePercentage}% upvoted</span>
+        <span>{upvotePercentage}% upvoted </span>
         {/* {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />} */}
         {currentAccount === "" ? (
           <ConnectButton onClick={connectWallet} />
         ) : (
-          <Card className="connectedWallet">
-            {`${currentAccount.substring(0, 5)}...${currentAccount.substring(
-              38
-            )}`}
-          </Card>
+          <span>
+            &nbsp; &nbsp; &nbsp; &nbsp; Current account:&nbsp;
+            <b>
+              {`${currentAccount.substring(0, 5)}...${currentAccount.substring(
+                38
+              )}`}
+            </b>
+          </span>
         )}
       </Wrapper>
     );
   }
 
+  //----------------COMMENT SECTION-------------------
   function PostDetailCommentSection({ postId }) {
     const { data: comments, isLoading } = useQuery(["comments", postId], () =>
       getCommentsByPostId(postId)

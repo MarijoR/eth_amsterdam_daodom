@@ -127,6 +127,16 @@ export async function startStream(postId) {
   return { id, ...updatePost.data() };
 }
 
+export async function stopStream(postId) {
+  const id = postId;
+  const postDoc = doc(db, "posts", id);
+  await updateDoc(postDoc, {
+    stream: false,
+  });
+  const updatePost = await getDoc(postDoc);
+  return { id, ...updatePost.data() };
+}
+
 export async function getDocuments(ref) {
   const snap = await getDocs(ref);
   const docs = snap.docs.map((doc) => ({
