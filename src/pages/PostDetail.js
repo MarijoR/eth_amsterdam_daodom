@@ -8,7 +8,12 @@ import UpdateStreamButton from "components/shared/UpdateStreamButton";
 import DeleteStreamButton from "components/shared/DeleteStreamButton";
 import Empty from "components/shared/Empty";
 import LoadingIndicatorBox from "components/shared/LoadingIndicator/Box";
-import { deletePost, getCommentsByPostId, getPost } from "lib/firebase";
+import {
+  deletePost,
+  getCommentsByPostId,
+  getPost,
+  startStream,
+} from "lib/firebase";
 import { usePostViewCount } from "lib/hooks";
 import toast from "react-hot-toast";
 import { useMutation, useQuery } from "react-query";
@@ -82,11 +87,12 @@ async function createNewFlow(recipient, flowRate) {
     });
 
     console.log("Creating your stream...");
-
+    toast.success("Creating your stream...");
     const result = await createFlowOperation.exec(signer);
     console.log(result);
   } catch (error) {
     console.error(error);
+    toast.error("Failed to create your stream");
   }
 }
 
@@ -113,9 +119,11 @@ async function updateExistingFlow(recipient, flowRate) {
     });
     const result = await updateFlowOperation.exec(signer);
     console.log(result);
+    toast.success("Congrats - you've just updated a money stream!");
     console.log("Congrats - you've just updated a money stream!");
   } catch (error) {
     console.error(error);
+    toast.error("Flow does not exist");
   }
 }
 
@@ -142,6 +150,7 @@ async function deleteFlow(currentAccount, recipient) {
     await deleteFlowOperation.exec(signer);
   } catch (error) {
     console.error(error);
+    toast.error("Flow does not exist");
   }
 }
 
@@ -221,6 +230,7 @@ export default function PostDetail() {
     <>
       <PostDetailPost post={post} />
       <ContractDefinition postId={postId} post={post} user={user} />
+      <InfoStream postId={postId} post={post} user={user} />
       <UpdateStream postId={postId} post={post} user={user} />
       <PostDetailInfoBar postId={postId} post={post} user={user} />
       {user && <CommentForm postId={postId} />}
@@ -255,6 +265,34 @@ export default function PostDetail() {
 
     const isAuthor = author.uid === user?.uid;
 
+    function handleStream() {
+      if (currentAccount === "") {
+        toast.error("Please connect your wallet");
+      } else {
+        console.log(post);
+        setIsButtonLoading(true);
+        createNewFlow(recipient, flowRate);
+        startStream(postId);
+        console.log(startStream(postId));
+        setTimeout(() => {
+          setIsButtonLoading(false);
+        }, 1000);
+      }
+    }
+    async function handleDeleteStream() {
+      if (currentAccount === "") {
+        toast.error("Please connect your wallet");
+      } else {
+        setIsButtonLoading(true);
+
+        deleteFlow(currentAccount, recipient);
+
+        setTimeout(() => {
+          setIsButtonLoading(false);
+        }, 1000);
+      }
+    }
+
     return (
       <Wrapper round={!user}>
         <span>
@@ -263,33 +301,9 @@ export default function PostDetail() {
           <p>This flow is equal to: {flowRateDisplay} DAIx/month</p>
         </span>
         {/* {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />} */}
-        <StreamButton
-          onClick={() => {
-            setIsButtonLoading(true);
-            createNewFlow(recipient, flowRate);
-            setTimeout(() => {
-              setIsButtonLoading(false);
-            }, 1000);
-          }}
-        />
-        {/*   <UpdateStreamButton
-          onClick={() => {
-            setIsButtonLoading(true);
-            updateExistingFlow(recipient, flowRate);
-            setTimeout(() => {
-              setIsButtonLoading(false);
-            }, 1000);
-          }}
-        /> */}
-        <DeleteStreamButton
-          onClick={() => {
-            setIsButtonLoading(true);
-            deleteFlow(currentAccount, recipient);
-            setTimeout(() => {
-              setIsButtonLoading(false);
-            }, 1000);
-          }}
-        />
+        <StreamButton onClick={handleStream} />
+
+        <DeleteStreamButton onClick={handleDeleteStream} />
       </Wrapper>
     );
   }
@@ -355,6 +369,16 @@ export default function PostDetail() {
             <></>
           )}
         </b>
+      </Wrapper>
+    );
+  }
+
+  function InfoStream({ user, post }) {
+    return (
+      <Wrapper round={!user}>
+        <span>
+          {post.stream ? <p> Streaming </p> : <p> No stream currently </p>}
+        </span>
       </Wrapper>
     );
   }

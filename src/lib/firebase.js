@@ -1,10 +1,31 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth, onAuthStateChanged, signOut} from 'firebase/auth';
-import { getFirestore, doc, collection, query, where, getDocs, setDoc, getDoc, addDoc, serverTimestamp, orderBy, runTransaction, deleteDoc } from 'firebase/firestore/lite'
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  getDoc,
+  addDoc,
+  serverTimestamp,
+  orderBy,
+  runTransaction,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore/lite";
 import { useEffect } from "react";
 import useStore from "store";
-import shallow from "zustand/shallow"
+import shallow from "zustand/shallow";
 import { getPostScore, getUpvotePercentage } from "./helpers";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -16,7 +37,7 @@ const firebaseConfig = {
   projectId: "reddit-clone-ab818",
   storageBucket: "reddit-clone-ab818.appspot.com",
   messagingSenderId: "137070986396",
-  appId: "1:137070986396:web:95e87fbef5401191475959"
+  appId: "1:137070986396:web:95e87fbef5401191475959",
 };
 
 // Initialize Firebase
@@ -94,6 +115,16 @@ export async function createPost(post) {
   const postDoc = doc(db, "posts", id);
   const newPost = await getDoc(postDoc);
   return { id, ...newPost.data() };
+}
+
+export async function startStream(postId) {
+  const id = postId;
+  const postDoc = doc(db, "posts", id);
+  await updateDoc(postDoc, {
+    stream: true,
+  });
+  const updatePost = await getDoc(postDoc);
+  return { id, ...updatePost.data() };
 }
 
 export async function getDocuments(ref) {
