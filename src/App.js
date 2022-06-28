@@ -11,6 +11,8 @@ import YourStream from "./components/Live-Steaming/YourStream"
 import { Route, Switch } from "react-router-dom";
 import GetNft from "./components/Live-Steaming/getNft";
 import Streamnote from "./components/Live-Steaming/streamnote";
+import Testing from "./components/Snapshot/testing";
+import Createproposal from "./components/Snapshot/Createproposal";
 
 export default function App() {
   useAuthUser()
@@ -24,6 +26,8 @@ export default function App() {
     <Route path="/multisig" component={MultiSigGnosis} />
     <Route path="/streams" component={Streams} />
     <Route path="/yourstream" component={YourStream} />
+    <Route path="/proposals" component={Testing} />
+    <Route path="/createproposals" component={Createproposal} />
     <Route path="/getnft" component={GetNft} />
     <Route path="/streamnote" component={Streamnote} />
     <Route path="/createpost" component={CreatePost} />
