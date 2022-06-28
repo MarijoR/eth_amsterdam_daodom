@@ -55,3 +55,5 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
 };
 
 export default BlogCard;
+
+//Uffi ipfs

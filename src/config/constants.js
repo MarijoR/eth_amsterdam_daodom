@@ -12,3 +12,5 @@ export const sampleURI = "https://ipfs.moralis.io:2053/ipfs/QmZEAjVpQSC6onTaLe1p
 //https://ipfs.moralis.io:2053/ipfs/Qmb9FJjuQ86k1b3yyKt23PoFuxyuDHnztjNT2kVxZUpiE1 -> das ist dieser sampleURI der bei HomeAuth.js angezeigt wird
 
 //https://ipfs.moralis.io:2053/ipfs/QmeWZtKuzKDFpGRD8Um8BHQVtDwnYBvXWntRxquEqeJuaP
+
+//Uffi ipfs

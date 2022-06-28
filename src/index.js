@@ -1,5 +1,5 @@
 import 'lib/date-config';
-// import AppProviders from "AppProviders";
+import AppProviders from "AppProviders";
 import ReactDOM from "react-dom";
 import "styles/index.css";
 import App from "./App";
@@ -21,6 +21,7 @@ const root = createRoot(rootElement);
   // document.getElementById("root")
   root.render(
   <React.StrictMode>
+    <AppProviders>
     <MoralisProvider
       initializeOnMount
       appId={"JVmVRhHRQpENMcVquiNmzqUg2rRNylXJWlaFl5MX"}
@@ -32,7 +33,10 @@ const root = createRoot(rootElement);
         </Router>
       </NotificationProvider>
     </MoralisProvider>
+    </AppProviders>
   </React.StrictMode>
 );
 
 serviceWorker.unregister();
+
+//Uffi ipfs
