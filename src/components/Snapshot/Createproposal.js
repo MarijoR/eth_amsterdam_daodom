@@ -36,6 +36,7 @@ const hub = 'https://testnet.snapshot.org';
  const [text3, setText3] = useState("");
  const [item, setItem] = useState([]);
  const [value, setValue] = useState([null, null]);
+
  
 console.log(value);
 
@@ -89,7 +90,12 @@ function getWeeksAfter(date, amount) {
    } else {
   setText3("")
     } if(title && type && item[0] != "") {
-  Create();
+  Create()
+  .catch(error => {
+    console.log(error);
+    alert("Something went wrong!")
+  });
+
   }
 };
   
@@ -98,9 +104,8 @@ async function Create() {
 
 const web3 = new Web3Provider(window.ethereum);
 let account = address;
-const start = value[0].getTime();
-const end = value[1].getTime();
-console.log(start);
+const start = value[0].getTime() / 1000;
+const end = value[1].getTime() / 1000;
 
 const receipt = await client.proposal(web3, account, {
   space: 'zischan.eth',
@@ -108,14 +113,15 @@ const receipt = await client.proposal(web3, account, {
   title: title,
   body: body,
   choices: item,
-  start: 1636984800,
-  end: 1637244000,
+  start: start,
+  end: end,
   snapshot: 13620822,
   network: chainId,
   strategies: JSON.stringify({}),
   plugins: JSON.stringify({}),
   metadata: JSON.stringify({})
 });
+alert("Successfully posted!");
 }
 
 
