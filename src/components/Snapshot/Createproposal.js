@@ -14,10 +14,16 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-
-
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import addWeeks from 'date-fns/addWeeks';
+import * as React from 'react';
 
 export default function Createproposal({chainId, address}) {
+ 
 
 const hub = 'https://testnet.snapshot.org'; 
  const client = new snapshot.Client712(hub);
@@ -25,6 +31,42 @@ const hub = 'https://testnet.snapshot.org';
  const [body, setBody] = useState("");
  const [text, setText] = useState("");
  const [type, setType] = useState("");
+ const [choices, setChoices] = useState("");
+ const [text2, setText2] = useState("");
+ const [text3, setText3] = useState("");
+ const [item, setItem] = useState([]);
+ const [value, setValue] = useState([null, null]);
+ 
+console.log(value);
+
+function getWeeksAfter(date, amount) {
+  return date ? addWeeks(date, amount) : undefined;
+}
+
+ const styles = {
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    width: 300,
+    margin: 100,
+  },
+  //style for font size
+  resize:{
+    fontSize:50
+  },
+}
+
+ const handleCounter = () => {
+   console.log(item, "item");
+   setItem([...item, ""]);
+ };
+
+ const setInput = (index) => (event) => {
+   item.splice(index, 1, event.target.value);
+   setItem([...item]);
+ };
 
 
  const handleChange = (event) => {
@@ -34,10 +76,19 @@ const hub = 'https://testnet.snapshot.org';
  const handleSubmit = e => {
   e.preventDefault();
 
-  if (!title || !type) {
-  setText("Please do not leave empty!")
+  if (!title) {
+  setText("Please fill in a Title!")
   } else {
   setText("")
+  } if(!type) {
+  setText2("Please choose a Voting-System!")
+} else {
+  setText2("")
+ } if(item[0] == "") {
+  setText3("Please fill in choices!")
+   } else {
+  setText3("")
+    } if(title && type && item[0] != "") {
   Create();
   }
 };
@@ -47,13 +98,16 @@ async function Create() {
 
 const web3 = new Web3Provider(window.ethereum);
 let account = address;
+const start = value[0].getTime();
+const end = value[1].getTime();
+console.log(start);
 
 const receipt = await client.proposal(web3, account, {
   space: 'zischan.eth',
   type: type,
   title: title,
   body: body,
-  choices: ['Alice', 'Bob', 'Carol'],
+  choices: item,
   start: 1636984800,
   end: 1637244000,
   snapshot: 13620822,
@@ -70,7 +124,7 @@ return (
   <form  id="myForm" onSubmit={handleSubmit}>
   <TextField 
     error={!!text}
-    helperText={text}
+    helpertext={text}
    fullWidth
   id="outlined-basic" 
   label="Title" 
@@ -79,19 +133,23 @@ return (
     />
      <TextField 
    fullWidth
+   margin="normal"
   id="outlined-basic" 
+  size="medium"
   label="Description (optional)" 
   variant="outlined" 
   onChange={e => setBody(e.target.value)}
     />
 
-<Select
-      autoWidth
+<TextField
+      fullWidth
+      select
       value={type}
       label="Voting system"
       onChange={handleChange}
-      error={!!text}
-    helperText={text}
+      margin="normal"
+      error={!!text2}
+    helpertext={text2}
     >
       <MenuItem value='single-choice'>Single choice voting</MenuItem>
       <MenuItem value='approval'>Approval voting</MenuItem>
@@ -99,8 +157,44 @@ return (
       <MenuItem value='ranked-choice'>Ranked choice voting</MenuItem>
       <MenuItem value='weighted'>Weighted voting</MenuItem>
       <MenuItem value='basic'>Basic voting</MenuItem>
-    </Select>
-   
+    </TextField>
+    <div>
+      {item.map((c, index) => {
+        return (
+          <TextField
+            error={!!text3}
+           helpertext={text3}
+            key={index}
+            label={`Choice ${index+1}`}
+            value={c}
+            onChange={setInput(index)}
+            fullWidth
+          />
+        );
+      })}
+    </div>
+      <Button 
+      fullWidth
+      margin="normal"
+      onClick={handleCounter}>Add a Choice</Button>
+    
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <DateRangePicker
+        disablePast
+        value={value}
+        maxDate={getWeeksAfter(value[0], 4)}
+        onChange={(newValue) => {
+          setValue(newValue);
+        }}
+        renderInput={(startProps, endProps) => (
+          <React.Fragment>
+            <TextField {...startProps} />
+            <Box sx={{ mx: 1 }}> </Box>
+            <TextField {...endProps} />
+          </React.Fragment>
+        )}
+      />
+    </LocalizationProvider>
 <Button
       type="submit"
       form="myForm"
