@@ -31,6 +31,7 @@ export default function App() {
     <Route path="/multisig" component={MultiSigGnosis} />
     <Route path="/createpost" component={CreatePost} />
     <Route path="/" component={Home} />
+  
     <>
     {isAuthenticated ? (
         <div className="App">
@@ -58,8 +59,8 @@ export default function App() {
 
     )}
     </>
-
-  </Switch>
+    
+    </Switch>
   </>;
 }
 

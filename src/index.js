@@ -5,21 +5,24 @@ import "styles/index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
-import { createRoot } from 'react-dom/client';
+// import { createRoot } from 'react-dom/client';
 import React from 'react';
 import { MoralisProvider } from "react-moralis";
 import { NotificationProvider } from "web3uikit";
 import { BrowserRouter as Router } from "react-router-dom";
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Failed to find the root element");
-const root = createRoot(rootElement);
+
+// const root = createRoot(rootElement);
 
 // ReactDOM.render(
   // <AppProviders>
   //   <App />
   // </AppProviders>,
   // document.getElementById("root")
-  root.render(
+
+  // root.render(
+  ReactDOM.render(
   <React.StrictMode>
     <AppProviders>
     <MoralisProvider
@@ -34,7 +37,8 @@ const root = createRoot(rootElement);
       </NotificationProvider>
     </MoralisProvider>
     </AppProviders>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById("root")
 );
 
 serviceWorker.unregister();
