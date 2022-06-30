@@ -22,7 +22,47 @@ export default function App() {
   useAuthUser();
   const { isAuthenticated } = useMoralis();
 
-  return <>
+  // Version1
+  // return (
+  // <>
+  // <Route component={Header} />
+  // {isAuthenticated ? (
+  //       <div className="App">
+  //         <div className="sideBar">
+  //           <Sidebar />
+  //           </div>
+  //         <div className="mainWindow">
+  // <Switch>
+  //   <Route path="/login" component={Login} />
+  //   <Route path="/signup" component={Signup} />
+  //   {/* <Route path="/createjob" component={CreateFlow} /> */}
+  //   <Route path="/multisig" component={MultiSigGnosis} />
+  //   <Route path="/createpost" component={CreatePost} />
+  //   <Route path="/" component={Home} />
+  //   <Route path="HomeAuth/" component={HomeAuth} />
+  //   <Route path="/newStory" component={NewStory} />
+  //   <Route path="/myBlogs" component={MyBlogs} />
+  //   <Route path="/blog/:url" component={Blog} />
+  //   </Switch>
+  //   </div>
+  //         <div className="rightBar">
+  //           <Rightbar />
+  //         </div>
+  //       </div>
+  //    ) : (
+  //     <div className="unAuth">
+  //         {/* <img src={logo} alt= "logo" height="200px"/> */}
+  //         <img src={logo} alt= "logo" height="300px" />
+  //         <ConnectButton />
+  //     </div>
+  //      )}
+  //      </>
+  // )
+  //    };
+  
+  //Version2:
+  return (
+  <>
   <Route component={Header} />
   <Switch>
     <Route path="/login" component={Login} />
@@ -31,8 +71,8 @@ export default function App() {
     <Route path="/multisig" component={MultiSigGnosis} />
     <Route path="/createpost" component={CreatePost} />
     <Route path="/" component={Home} />
-  
-    <>
+    </Switch>
+    <></>
     {isAuthenticated ? (
         <div className="App">
           <div className="sideBar">
@@ -59,9 +99,8 @@ export default function App() {
 
     )}
     </>
-    
-    </Switch>
-  </>;
-}
+   )
+};
+
 
 //Uffi ipfs
