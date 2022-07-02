@@ -21,7 +21,7 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
 
   //Achtung hier davor "/" -> HomeAuth.js
   const clickHandler = () => {
-    const lastSegment = externalUrl.split("HomeAuth/").pop();
+    const lastSegment = externalUrl.split("/HomeAuth").pop();
     navigate(`/blog/${lastSegment}`);
     // {Link} to=(`/blog/${lastSegment}`);
   };

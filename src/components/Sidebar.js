@@ -20,7 +20,7 @@ const Sidebar = () => {
     <div className="siderContent">
       <img className="logo" src={logo}></img>
       <div className="menu">
-        <Link to="HomeAuth/" className="link">
+        <Link to="/HomeAuth" className="link">
           <div className="menuItems">
             <HomeIcon />
           </div>

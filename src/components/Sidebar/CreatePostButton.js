@@ -23,7 +23,7 @@ export default function SidebarCreatePostButton() {
     <CreatePostButton as={Link} to="/createpost">
       create proposal
     </CreatePostButton>
-     <CreateBlogButton as={Link} to="HomeAuth/">
+     <CreateBlogButton as={Link} to="/HomeAuth">
       create blog
     </CreateBlogButton> 
     </div>
