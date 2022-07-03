@@ -34,6 +34,7 @@ import {
 } from "react-bootstrap";
 import "../components/SuperFluid/createFlow.css";
 import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 
 const Wrapper = styled.div`
   display: flex;
@@ -147,13 +148,13 @@ async function balanceOf(currentAccount, recipient) {
 
   try {
     // Read functions
-    const result1 = await sf.cfaV1.getFlow({
+    /*   const result1 = await sf.cfaV1.getFlow({
       superToken: DAIx,
       sender: currentAccount,
       receiver: recipient,
       providerOrSigner: signer,
     });
-
+ */
     const result2 = await sf.cfaV1.getAccountFlowInfo({
       superToken: DAIx,
       account: currentAccount,
@@ -166,27 +167,45 @@ async function balanceOf(currentAccount, recipient) {
       providerOrSigner: signer,
     });
 
+    const stream = new BigNumber(result3 * (86400 * 30)).shiftedBy(-18);
+
     const result4 = await DAIxContract.balanceOf({
       account: currentAccount,
       providerOrSigner: signer,
     });
+    const adjustedBal = Number(new BigNumber(result4).shiftedBy(-18)).toFixed(
+      5
+    );
 
-    const result5 = await DAIxContract.allowance({
+    /* const result5 = await DAIxContract.allowance({
       owner: recipient,
       spender: currentAccount,
       providerOrSigner: signer,
-    });
+    }); */
+
+    /*   const result6 = await sf.cfaV1.listFlows({
+      superToken: DAIx,
+      account: currentAccount,
+      providerOrSigner: signer,
+    }); */
 
     //-----TEST----------
-    console.log("getFlow:", result1);
-    console.log("getAccountFlowInfo:", result2);
-    console.log("getNetFlow:", result3);
-    console.log("balanceOf:", result4);
-    console.log("allowance:", result5);
+    //console.log("getFlow: ", result1);
+    console.log("getAccountFlowInfo: ", result2);
+    console.log("getNetFlow: ", result3);
+    console.log("stream: ", stream.toFixed(2), " DAIx/month");
+    console.log("balanceOf: ", adjustedBal);
+    //console.log("allowance:", result5);
+    //console.log("list:", result6);
   } catch (error) {
     console.error(error);
   }
 }
+/* 
+function calculateStream(flowRate) {
+  const stream = new BigNumber(flowRate * (86400 * 30)).shiftedBy(-18);
+  return stream.toFixed(2);
+} */
 
 //----------------DELETE FLOW FUNKTION-------------------
 async function deleteFlow(currentAccount, recipient) {
