@@ -43,7 +43,7 @@ export default function Account({
   address,
   userSigner,
   localProvider,
-  mainnetProvider,
+  //mainnetProvider,
   price,
   minimized,
   web3Modal,
@@ -81,14 +81,17 @@ export default function Account({
     }
   }
 
-  const { currentTheme } = useThemeSwitcher();
+  //const { currentTheme } = useThemeSwitcher();
 
   const display = minimized ? (
     ""
   ) : (
     <span>
       {address ? (
-        <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+        <Address address={address} 
+        //ensProvider={mainnetProvider} 
+        //blockExplorer={blockExplorer} 
+        />
       ) : (
         "Connecting..."
       )}
@@ -97,9 +100,9 @@ export default function Account({
         address={address}
         provider={localProvider}
         signer={userSigner}
-        ensProvider={mainnetProvider}
+        //ensProvider={mainnetProvider}
         price={price}
-        color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
+        //color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
       />
     </span>
   );

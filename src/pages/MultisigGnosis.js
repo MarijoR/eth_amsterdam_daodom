@@ -10,6 +10,8 @@ import usePoller from "../hooks/Poller";
 import useLocalStorage from "../hooks/LocalStorage";
 import useBalance from "../hooks/Balance";
 import useSafeSdk from "../hooks/SafeSdk";
+import useUserSigner from "../hooksg/UserSigner";
+import {NETWORKS} from "../constants"
 
 import { EthSignSignature } from './EthSignSignature'
 import WalletConnect from "@walletconnect/client";
@@ -20,13 +22,13 @@ import Web3Modal from "web3modal";
 const serviceClient = new SafeServiceClient('https://safe-transaction.rinkeby.gnosis.io')
 
 export default function GnosisStarterView({
-  userSigner,
-  address,
+  //userSigner,
+  //address,
   mainnetProvider,
-  localProvider,
+  //localProvider,
   price,
   blockExplorer,
-  targetNetwork
+  //targetNetwork
 }) {
   const [to, setTo] = useState('')
   const [threshold, setThreshold] = useState(0)
@@ -43,10 +45,53 @@ export default function GnosisStarterView({
   ]
   const THRESHOLD = 2
 
+  const targetNetwork = NETWORKS.rinkeby;
+
+  // 🏠 Your local provider is usually pointed at your local blockchain
+const localProviderUrl = targetNetwork.rpcUrl;
+// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
+const localProviderUrlFromEnv = localProviderUrl;
+//if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
+// unten einkommentieren
+const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
+
+  const [address, setAddress] = useState();
+
+  const userSigner = useUserSigner(injectedProvider, localProvider);
+
+  useEffect(() => {
+    async function getAddress() {
+      if (userSigner) {
+        const newAddress = await userSigner.getAddress();
+        setAddress(newAddress);
+      }
+    }
+    getAddress();
+  }, [userSigner]);
+
   const [safeAddress, setSafeAddress] = useLocalStorage("deployedSafe")
   const [ deploying, setDeploying ] = useState()
   const safeBalance = useBalance(localProvider, safeAddress);
   const { safeSdk, safeFactory } = useSafeSdk(userSigner, safeAddress)
+
+  const [injectedProvider, setInjectedProvider] = useState();
+
+  const logoutOfWeb3Modal = async () => {
+    await web3Modal.clearCachedProvider();
+    if(injectedProvider && injectedProvider.provider && typeof injectedProvider.provider.disconnect == "function"){
+      await injectedProvider.provider.disconnect();
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 1);
+  };
+
+  const web3Modal = new Web3Modal({
+    network: "rinkeby", // Optional. If using WalletConnect on xDai, change network to "xdai" and add RPC info below for xDai chain.
+    cacheProvider: true, // optional
+    theme:"dark", // optional. Change to "dark" for a dark theme.
+    providerOptions: {},
+    });
 
   const isSafeOwnerConnected = owners.includes(address)
 
@@ -138,6 +183,34 @@ export default function GnosisStarterView({
     return !!confirmation
   }
 
+  const loadWeb3Modal = useCallback(async () => {
+    const provider = await web3Modal.connect();
+    setInjectedProvider(new ethers.providers.Web3Provider(provider));
+
+    provider.on("chainChanged", chainId => {
+      console.log(`chain changed to ${chainId}! updating providers`);
+      setInjectedProvider(new ethers.providers.Web3Provider(provider));
+    });
+
+    provider.on("accountsChanged", () => {
+      console.log(`account changed!`);
+      setInjectedProvider(new ethers.providers.Web3Provider(provider));
+    });
+
+    // Subscribe to session disconnection
+    provider.on("disconnect", (code, reason) => {
+      console.log(code, reason);
+      logoutOfWeb3Modal();
+    });
+  }, [setInjectedProvider]);
+
+  useEffect(() => {
+    if (web3Modal) {
+      loadWeb3Modal();
+    }
+  }, [loadWeb3Modal
+  ]);
+
 
 
   usePoller(async () => {
@@ -159,7 +232,8 @@ export default function GnosisStarterView({
         console.log("ERROR POLLING FROM SAFE:",e)
       }
     }
-  },3333);
+  },3333
+);
 
   const [ walletConnectUrl, setWalletConnectUrl ] = useState()
   const [ connected, setConnected ] = useState()
@@ -181,15 +255,7 @@ export default function GnosisStarterView({
             icons: ["http://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/owl.png"],
             name: "Gnosis Safe Starter Kit",
           },
-        }/*,
-        {
-          // Optional
-          url: "<YOUR_PUSH_SERVER_URL>",
-          type: "fcm",
-          token: token,
-          peerMeta: true,
-          language: language,
-        }*/
+        }
       );
 
       // Subscribe to session requests
@@ -210,23 +276,6 @@ export default function GnosisStarterView({
 
         setConnected(true)
 
-
-        /* payload:
-        {
-          id: 1,
-          jsonrpc: '2.0'.
-          method: 'session_request',
-          params: [{
-            peerId: '15d8b6a3-15bd-493e-9358-111e3a4e6ee4',
-            peerMeta: {
-              name: "WalletConnect Example",
-              description: "Try out WalletConnect v1.0",
-              icons: ["https://example.walletconnect.org/favicon.ico"],
-              url: "https://example.walletconnect.org"
-            }
-          }]
-        }
-        */
       });
 
       // Subscribe to call requests
@@ -241,21 +290,6 @@ export default function GnosisStarterView({
         setTo(payload.params[0].to)
         setData(payload.params[0].data?payload.params[0].data:"0x0000")
         setValue(payload.params[0].value)
-        /* payload:
-        {
-          id: 1,
-          jsonrpc: '2.0'.
-          method: 'eth_sign',
-          params: [
-            "0xbc28ea04101f03ea7a94c1379bc3ab32e65e62d3",
-            "My email is john@doe.com - 1537836206101"
-          ]
-        }
-        */
-        /*connector.approveRequest({
-          id: payload.id,
-          result: "0x41791102999c339c844880b23950704cc43aa840f3739e365323cda4dfa89e7a"
-        });*/
 
       });
 
@@ -268,14 +302,17 @@ export default function GnosisStarterView({
         // Delete connector
       });
     }
-  },[ walletConnectUrl ])
+  },[ 1
+    //walletConnectUrl
+   ])
 
 
   let safeInfo
   if(safeAddress){
     safeInfo = (
       <div>
-        <Address value={safeAddress} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+        <Address value={safeAddress} 
+        blockExplorer={blockExplorer} />
         <Balance value={safeBalance} price={price} />
 
         <div style={{padding:8}}>
@@ -437,6 +474,19 @@ export default function GnosisStarterView({
 
   return (
     <div>
+      <div 
+      //style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}
+      >
+        <Account
+          address={address}
+          localProvider={localProvider}
+          userSigner={userSigner}
+          web3Modal={web3Modal}
+          loadWeb3Modal={loadWeb3Modal}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+        />
+
+      </div>
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
         {safeAddress?<div style={{float:"right", padding:4, cursor:"pointer", fontSize:28}} onClick={()=>{
           setSafeAddress("")
