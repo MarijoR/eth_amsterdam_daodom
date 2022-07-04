@@ -1,4 +1,4 @@
-import "../styles/Sidebar.css";
+import "../styles/Sidebar_Uffi.css";
 import { Link } from "react-router-dom";
 import { useMoralis } from "react-moralis";
 import HomeIcon from "@mui/icons-material/Home";
@@ -8,7 +8,7 @@ import RateReviewIcon from "@mui/icons-material/RateReview";
 // import logo from "../images/m.png";
 import logo from "../images/chaincentive.png";
 
-const Sidebar = () => {
+const Sidebar_Uffi = () => {
   const { logout } = useMoralis();
 
   const logOut = async () => {
@@ -44,6 +44,6 @@ const Sidebar = () => {
 );
 };
 
-export default Sidebar;
+export default Sidebar_Uffi;
 
 //Uffi ipfs
