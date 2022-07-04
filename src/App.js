@@ -7,6 +7,7 @@ import Login from "pages/Login";
 import Signup from "pages/Signup";
 // import { CreateFlow } from "./components/SuperFluid/CreateFlow"
 import { Route, Switch } from "react-router-dom";
+import Gnosis from "./pages/Gnosis";
 
 export default function App() {
   useAuthUser()
@@ -17,7 +18,7 @@ export default function App() {
     <Route path="/login" component={Login} />
     <Route path="/signup" component={Signup} />
     {/* <Route path="/createjob" component={CreateFlow} /> */}
-    <Route path="/multisig" component={MultiSigGnosis} />
+    <Route path="/multisig" component={Gnosis} />
     <Route path="/createpost" component={CreatePost} />
     <Route path="/" component={Home} />
 
