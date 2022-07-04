@@ -3,14 +3,14 @@ import "../styles/MyBlogs.css";
 import axios from "axios";
 import BlogCard from "../components/BlogCard"
 import { Button } from "web3uikit";
-import { Link } from "react-router-dom";
+import { Link, Redirect, useHistory } from "react-router-dom";
 import { useMoralisWeb3Api, useMoralis } from "react-moralis";
 
 const MyBlogs = () => {
 
   const Web3Api = useMoralisWeb3Api();
   const { isInitialized, isAuthenticated, account } = useMoralis();
-  const navigate = Link();
+  // const navigate = Link(); //FALSCH 
   const [blogs, setBlogs] = useState();
   //das hier war zwischen den Klammern bei blogs, hard gecodet
   //   [
@@ -81,8 +81,13 @@ const MyBlogs = () => {
     } 
   }, [isAuthenticated, isInitialized, account]);
 
+  let history = useHistory();
+
   const clickHandler = () => {
-    navigate("/newStory");
+    // navigate("/newStory");
+    // <Link to={("/newStory")}></Link>
+    //  <Redirect to="/newStory" />
+    history.push("/newStory");
   };
  
 
@@ -112,7 +117,7 @@ const MyBlogs = () => {
           }}
         >
           <p>No Blogs Yet</p>
-          <Button text="Create one" onClick={clickHandler} />
+          <Button text="Create one" onClick= {clickHandler} />
         </div>
         )}
       </div>

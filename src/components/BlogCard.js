@@ -1,6 +1,6 @@
 import "../styles/BlogCard.css";
 // import { useNavigate } from "react-router-dom"; 
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
   // const BlogCard = ({ name, description, ownerOf, externalUrl }) => {
@@ -17,13 +17,15 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
 
   const account = `${ownerOf.slice(0, 4)}...${ownerOf.slice(38)}`;
 
-  const navigate = Link();
+  // const navigate = Link();
 
-  //Achtung hier davor "/" -> HomeAuth.js
+  const history = useHistory();
+  //Achtung hier war davor "/" -> ich hab "/" ->  /HomeAuth.js genannt, ist aber trotzdem so richtig:
   const clickHandler = () => {
-    const lastSegment = externalUrl.split("/HomeAuth").pop();
-    navigate(`/blog/${lastSegment}`);
-    // {Link} to=(`/blog/${lastSegment}`);
+    const lastSegment = externalUrl.split("/").pop();
+    // navigate(`/blog/${lastSegment}`);
+    // <Link to={(`/blog/${lastSegment}`)}></Link>
+    history.push(`/blog/${lastSegment}`);
   };
 
   return (
