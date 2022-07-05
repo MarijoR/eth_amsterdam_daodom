@@ -96,25 +96,16 @@ async function createNewFlow(recipient, flowRate, postId, currentAccount) {
     console.log(result);
 
     try {
-      const resultSender = await DAIxContract.balanceOf({
-        account: currentAccount,
-        providerOrSigner: signer,
-      });
-      /* const balanceSender = Number(
-      new BigNumber(resultSender).shiftedBy(-18)
-    ).toFixed(5); */
-
       const resultReceiver = await DAIxContract.balanceOf({
         account: recipient,
         providerOrSigner: signer,
       });
-      /* const balanceReceiver = Number(
-      new BigNumber(resultReceiver).shiftedBy(-18)
-    ).toFixed(5); */
+      const balanceReceiver = Number(
+        new BigNumber(resultReceiver).shiftedBy(-18)
+      ).toFixed(5);
 
-      startStream(postId, resultReceiver, flowRate);
-      console.log("balanceOf Sender: ", resultSender);
-      console.log("balanceOf Receiver: ", resultReceiver);
+      startStream(postId, balanceReceiver, flowRate);
+      console.log("balanceOf Receiver: ", balanceReceiver);
     } catch (error) {
       console.error(error);
     }
@@ -156,8 +147,11 @@ async function updateExistingFlow(recipient, flowRate, postId) {
         account: recipient,
         providerOrSigner: signer,
       });
-      updateStream(postId, resultReceiver, flowRate);
-      console.log("balanceOf Receiver: ", resultReceiver);
+      const balanceReceiver = Number(
+        new BigNumber(resultReceiver).shiftedBy(-18)
+      ).toFixed(5);
+      updateStream(postId, balanceReceiver, flowRate);
+      console.log("balanceOf Receiver: ", balanceReceiver);
     } catch (error) {
       console.error(error);
     }
@@ -270,8 +264,11 @@ async function deleteFlow(currentAccount, recipient, postId) {
         account: recipient,
         providerOrSigner: signer,
       });
-      stopStream(postId, resultReceiver);
-      console.log("balanceOf Receiver: ", resultReceiver);
+      const balanceReceiver = Number(
+        new BigNumber(resultReceiver).shiftedBy(-18)
+      ).toFixed(5);
+      stopStream(postId, balanceReceiver);
+      console.log("balanceOf Receiver: ", balanceReceiver);
     } catch (error) {
       console.error(error);
     }
@@ -514,14 +511,14 @@ export default function PostDetail() {
             <p> No stream currently </p>
           )}
         </span>
-        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>&nbsp; &nbsp; &nbsp; </span>
         <span>{post.payed && <p> Balance payed: </p>}</span>
         {post.paid ? (
           <p> Balance payed: {post.paid} </p>
         ) : (
           <p> Balance payed: 0 </p>
         )}
-        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>&nbsp; &nbsp; </span>
         <span>
           {post.remaining ? (
             <p> Balance remaining: {post.remaining} </p>
@@ -529,7 +526,7 @@ export default function PostDetail() {
             <p> Balance remaining: {flowRate} </p>
           )}
         </span>
-        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>&nbsp; &nbsp; </span>
         <span>
           {post.newFlowrate ? (
             <p> New Flow Rate: {post.newFlowrate} </p>
@@ -537,7 +534,7 @@ export default function PostDetail() {
             <p> {""} </p>
           )}
         </span>
-        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>&nbsp; &nbsp; </span>
       </Wrapper>
     );
   }

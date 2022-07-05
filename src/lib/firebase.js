@@ -125,6 +125,7 @@ export async function startStream(postId, balanceReceiver, flowrate) {
     balanceReceiver,
     paid: 0,
     remaining: flowrate,
+    newFlowrate: flowrate,
   });
   const updatePost = await getDoc(postDoc);
   return { id, ...updatePost.data() };
@@ -135,15 +136,9 @@ export async function updateStream(postId, balanceReceiver, newFlowrate) {
   const postDoc = doc(db, "posts", id);
   const docSnap = await getDoc(postDoc);
   const post = docSnap.data();
-  console.log("post: ", post);
-  console.log("post Balance: ", post.balanceReceiver);
-  console.log("api Balance: ", balanceReceiver);
-  const paid = Number(balanceReceiver - post.balanceReceiver);
-  console.log("paid: ", paid);
-  const remaining = Number(
-    post.flowrate - (balanceReceiver - post.balanceReceiver)
-  );
-  console.log("rem: ", remaining);
+  const paid =
+    Number(post.paid) + Number(balanceReceiver - post.balanceReceiver);
+  const remaining = Number(newFlowrate - paid);
   await updateDoc(postDoc, {
     balanceReceiver,
     paid,
@@ -159,13 +154,9 @@ export async function stopStream(postId, balanceReceiver) {
   const postDoc = doc(db, "posts", id);
   const docSnap = await getDoc(postDoc);
   const post = docSnap.data();
-  const paid = Number(balanceReceiver - post.balanceReceiver);
-  const remaining = Number(
-    post.flowrate - (balanceReceiver - post.balanceReceiver)
-  );
-  console.log("post: ", post);
-  console.log("post Balance: ", post.balanceReceiver);
-  console.log("api Balance: ", balanceReceiver);
+  const paid =
+    Number(post.paid) + Number(balanceReceiver - post.balanceReceiver);
+  const remaining = Number(post.newFlowrate - paid);
   await updateDoc(postDoc, {
     stream: false,
     balanceReceiver,
