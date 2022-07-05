@@ -4,16 +4,13 @@ import { useState } from 'react';
 import ConnectWallet from './ConnectWalletSS';
 import Proposal from './proposals';
 import Createproposal from './Createproposal';
-import Information from './informations';
 
 const theme = createTheme();
 
 
-export default function Testing() {
+export default function Testing2() {
 const [chainId, setChainId] = useState("");
 const [address, setAddress] = useState("");
-const [cardId, setCardId] = useState("");
-const [go, setGo] = useState("");
 
 console.log({ chainId })
   return (
@@ -25,24 +22,11 @@ console.log({ chainId })
        )
      }
      {
-       chainId && !cardId && !go &&(
-         <Proposal
+       chainId && (
+         <Createproposal
    
          chainId = {chainId}
           address = {address}
-          setCardId = {setCardId}
-          setGo = {setGo}
-         />
-       )
-     }
-       {
-       cardId && go && (
-         <Information
-   
-         chainId = {chainId}
-          address = {address}
-          cardId = {cardId}
-          go = {go}
          />
        )
      }

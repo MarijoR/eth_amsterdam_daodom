@@ -12,7 +12,8 @@ import { Route, Switch } from "react-router-dom";
 import GetNft from "./components/Live-Steaming/getNft";
 import Streamnote from "./components/Live-Steaming/streamnote";
 import Testing from "./components/Snapshot/testing";
-import Createproposal from "./components/Snapshot/Createproposal";
+import Createproposal from "./components/Snapshot/Createproposal"
+import Testing2 from "./components/Snapshot/testing2";
 
 export default function App() {
   useAuthUser()
@@ -27,7 +28,7 @@ export default function App() {
     <Route path="/streams" component={Streams} />
     <Route path="/yourstream" component={YourStream} />
     <Route path="/proposals" component={Testing} />
-    <Route path="/createproposals" component={Createproposal} />
+    <Route path="/createproposal" component={Testing2} />
     <Route path="/getnft" component={GetNft} />
     <Route path="/streamnote" component={Streamnote} />
     <Route path="/createpost" component={CreatePost} />

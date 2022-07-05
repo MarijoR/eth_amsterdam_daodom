@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import { useHistory } from "react-router-dom";
 import Createproposal from './Createproposal';
 
-export default function Proposal({chainId, address, setCardId, setGo}) {
+export default function Information({chainId, address, cardId, go}) {
     let history = useHistory();
 const hub = 'https://testnet.snapshot.org'; 
  const client = new snapshot.Client712(hub);
@@ -37,6 +37,7 @@ useEffect(() =>{
       skip: 0,
       where: {
         space_in: ["zischan.eth"],
+        id: "${cardId}",
       },
       orderBy: "created",
       orderDirection: desc
@@ -83,12 +84,6 @@ start: d.start,
 fetchData()
 }, []);
 
-const Info = (id) => {
-setCardId(id);
-setGo("Go");
-console.log(id)
-}
-
 
 return (
   <div>
@@ -120,7 +115,7 @@ return (
           <CardActions>
             <Button 
              key={index}
-          onClick= {()=> {Info(item.id)}}
+      
             size="small">Learn More</Button>
           </CardActions>
         </Card>

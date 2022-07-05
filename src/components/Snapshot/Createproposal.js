@@ -22,7 +22,7 @@ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import addWeeks from 'date-fns/addWeeks';
 import * as React from 'react';
 
-export default function Createproposal({chainId, address}) {
+export default function Createproposal({chainId, address, cardId}) {
  
 
 const hub = 'https://testnet.snapshot.org'; 
