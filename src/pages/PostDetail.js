@@ -13,6 +13,7 @@ import {
   getCommentsByPostId,
   getPost,
   startStream,
+  updateStream,
   stopStream,
 } from "lib/firebase";
 import { usePostViewCount } from "lib/hooks";
@@ -67,7 +68,7 @@ const PostWrapper = styled.div`
 `;
 
 //----------------CREATE NEW FLOW FUNKTION-------------------
-async function createNewFlow(recipient, flowRate) {
+async function createNewFlow(recipient, flowRate, postId, currentAccount) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = provider.getSigner();
@@ -93,6 +94,30 @@ async function createNewFlow(recipient, flowRate) {
     toast.success("Creating your stream...");
     const result = await createFlowOperation.exec(signer);
     console.log(result);
+
+    try {
+      const resultSender = await DAIxContract.balanceOf({
+        account: currentAccount,
+        providerOrSigner: signer,
+      });
+      /* const balanceSender = Number(
+      new BigNumber(resultSender).shiftedBy(-18)
+    ).toFixed(5); */
+
+      const resultReceiver = await DAIxContract.balanceOf({
+        account: recipient,
+        providerOrSigner: signer,
+      });
+      /* const balanceReceiver = Number(
+      new BigNumber(resultReceiver).shiftedBy(-18)
+    ).toFixed(5); */
+
+      startStream(postId, resultReceiver, flowRate);
+      console.log("balanceOf Sender: ", resultSender);
+      console.log("balanceOf Receiver: ", resultReceiver);
+    } catch (error) {
+      console.error(error);
+    }
   } catch (error) {
     console.error(error);
     toast.error("Failed to create your stream");
@@ -100,7 +125,7 @@ async function createNewFlow(recipient, flowRate) {
 }
 
 //----------------UPDATE EXISTING FLOW FUNKTION-------------------
-async function updateExistingFlow(recipient, flowRate) {
+async function updateExistingFlow(recipient, flowRate, postId) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
 
   const signer = provider.getSigner();
@@ -125,6 +150,17 @@ async function updateExistingFlow(recipient, flowRate) {
     console.log(result);
     toast.success("Congrats - you've just updated a money stream!");
     console.log("Congrats - you've just updated a money stream!");
+
+    try {
+      const resultReceiver = await DAIxContract.balanceOf({
+        account: recipient,
+        providerOrSigner: signer,
+      });
+      updateStream(postId, resultReceiver, flowRate);
+      console.log("balanceOf Receiver: ", resultReceiver);
+    } catch (error) {
+      console.error(error);
+    }
   } catch (error) {
     console.error(error);
     toast.error("Flow does not exist or not enough available balance");
@@ -208,7 +244,7 @@ function calculateStream(flowRate) {
 } */
 
 //----------------DELETE FLOW FUNKTION-------------------
-async function deleteFlow(currentAccount, recipient) {
+async function deleteFlow(currentAccount, recipient, postId) {
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
@@ -227,9 +263,18 @@ async function deleteFlow(currentAccount, recipient) {
       superToken: DAIx,
       // userData?: string
     });
-
     const result = await deleteFlowOperation.exec(signer);
     console.log(result);
+    try {
+      const resultReceiver = await DAIxContract.balanceOf({
+        account: recipient,
+        providerOrSigner: signer,
+      });
+      stopStream(postId, resultReceiver);
+      console.log("balanceOf Receiver: ", resultReceiver);
+    } catch (error) {
+      console.error(error);
+    }
   } catch (error) {
     console.error(error);
     toast.error("Flow does not exist");
@@ -356,9 +401,9 @@ export default function PostDetail() {
         toast.error("Please connect your wallet");
       } else {
         setIsButtonLoading(true);
-        createNewFlow(recipient, flowRate);
-        startStream(postId);
-        balanceOf(currentAccount, recipient);
+        createNewFlow(recipient, flowRate, postId, currentAccount);
+        //startStream(postId);
+        //balanceOf(currentAccount, recipient);
         setTimeout(() => {
           setIsButtonLoading(false);
         }, 1000);
@@ -369,7 +414,7 @@ export default function PostDetail() {
         toast.error("Please connect your wallet");
       } else {
         setIsButtonLoading(true);
-        deleteFlow(currentAccount, recipient);
+        deleteFlow(currentAccount, recipient, postId);
         stopStream(postId);
         setTimeout(() => {
           setIsButtonLoading(false);
@@ -444,7 +489,7 @@ export default function PostDetail() {
             <UpdateStreamButton
               onClick={() => {
                 setIsButtonLoading(true);
-                updateExistingFlow(recipient, newFlowRate);
+                updateExistingFlow(recipient, newFlowRate, postId);
                 setTimeout(() => {
                   setIsButtonLoading(false);
                 }, 1000);
@@ -463,13 +508,36 @@ export default function PostDetail() {
     return (
       <Wrapper round={!user}>
         <span>
-          {post.stream ? <p> Streaming </p> : <p> No stream currently </p>}
+          {post.stream ? (
+            <p style={{ color: "green" }}> Streaming </p>
+          ) : (
+            <p> No stream currently </p>
+          )}
         </span>
-        <UpdateStreamButton
-          onClick={() => {
-            balanceOf(currentAccount, recipient);
-          }}
-        />
+        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>{post.payed && <p> Balance payed: </p>}</span>
+        {post.paid ? (
+          <p> Balance payed: {post.paid} </p>
+        ) : (
+          <p> Balance payed: 0 </p>
+        )}
+        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>
+          {post.remaining ? (
+            <p> Balance remaining: {post.remaining} </p>
+          ) : (
+            <p> Balance remaining: {flowRate} </p>
+          )}
+        </span>
+        <span>&nbsp; &nbsp; &nbsp;</span>
+        <span>
+          {post.newFlowrate ? (
+            <p> New Flow Rate: {post.newFlowrate} </p>
+          ) : (
+            <p> {""} </p>
+          )}
+        </span>
+        <span>&nbsp; &nbsp; &nbsp;</span>
       </Wrapper>
     );
   }
