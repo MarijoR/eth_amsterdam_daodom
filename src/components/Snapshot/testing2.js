@@ -18,7 +18,7 @@ console.log({ chainId })
     <header className="App-header">
      {
        !address && (
-         <ConnectWallet setChainId={setChainId} setAddress={setAddress} />
+         <ConnectWallet setChainId={setChainId} setAddress={setAddress}/>
        )
      }
      {

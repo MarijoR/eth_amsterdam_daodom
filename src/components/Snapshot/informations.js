@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useHistory } from "react-router-dom";
 import Createproposal from './Createproposal';
+import { ConstantFlowAgreementV1 } from '@superfluid-finance/sdk-core';
 
 export default function Information({chainId, address, cardId, go}) {
     let history = useHistory();
@@ -20,13 +21,29 @@ const hub = 'https://testnet.snapshot.org';
  const client = new snapshot.Client712(hub);
  const [title, setTitle] = useState("");
  const [body, setBody] = useState("");
+ const [text2, setText2] = useState(0);
+const [type, setType] = useState("");
 
   const headers = { 
     'Content-Type': 'application/json'
   }
 
+async function Cast(t) {
+  setType(t);
+  const web3 = new Web3Provider(window.ethereum);
+let account = address;
+
+  const receipt = await client.vote(web3, account, {
+    space: 'zischan.eth',
+    proposal: `${cardId}`,
+    type: type,
+    choice: text2+1,
+    metadata: JSON.stringify({})
+  });
+}
 
   const [text, setText] = useState([]);
+  const [choice, setChoice] = useState([]);
   const axios = require('axios');
 
 useEffect(() =>{
@@ -43,6 +60,7 @@ useEffect(() =>{
       orderDirection: desc
     ) {
       id
+      type
       title
       body
       choices
@@ -84,44 +102,34 @@ start: d.start,
 fetchData()
 }, []);
 
-
 return (
-  <div>
-     <div>
-   <Container component="main" maxWidth="xs">
-    <Button
-    fullWidth
-    variant="contained"
-    sx={{ mt: 5, mb: 2 }}
-    onClick={() =>   history.replace('/createproposal')}
-  >
-    Create your proposal
-  </Button>
-  </Container>
-  </div>
+  
           <div>
           { text.map(function (item, index) { return ( 
-          <Card sx={{ minWidth: 400, minHeight: 20, marginTop: 4, mb: 2 }}>
-          <CardContent>
-          <Typography sx={{ fontSize: 16 }} color="text.secondary" key={index}>
-            </Typography>
-            <Typography sx={{ fontSize: 16 }} color="text.secondary" key={index}>
+          <>
+            <Typography variant="h1" key={index}>
             {item.title}
             </Typography>
-            <Typography variant="h6" component="div" key={index}>
+            <Button color="secondary" variant="contained">{item.state}</Button>
+            <Typography variant="h6" key={index}>
               {item.body}
             </Typography>
-          </CardContent>
-          <CardActions>
-            <Button 
-             key={index}
-      
-            size="small">Learn More</Button>
-          </CardActions>
-        </Card>
+                 
+      <Typography variant="h4" key={index}>
+             Cast your vote
+             </Typography>   
+             <div>
+         {item.choices.map( function (subitem, i) { return (
+                  <Button fullWidth variant="outlined" key={i}   onClick={() => setText2(i)}> {subitem}</Button>
+                  )})
+                }
+       </div>
+       <Button variant="contained" fullWidth  onClick= {()=> {Cast(item.type)}}> Vote</Button>
+            </>
+                
         )})
       }
-           </div>
-           </div>
+              </div>
+           
   );
 }

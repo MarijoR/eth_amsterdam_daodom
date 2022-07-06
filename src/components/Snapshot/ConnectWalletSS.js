@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 
-export default function ConnectWallet({ setChainId, setAddress }) {
+export default function ConnectWallet({ setChainId, setAddress}) {
   const handleWalletConnect = async () => {
     const { ethereum } = window;
     if (ethereum) {
