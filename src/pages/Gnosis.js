@@ -1,35 +1,40 @@
 import { React, useState, useEffect } from "react";
 import { Box, Button, Card, Grid, Typography } from "@mui/material";
-import ButtonAppBar from "../components/ButtonAppBar";
 import { ethers } from 'ethers'
 import EthersAdapter from '@gnosis.pm/safe-core-sdk'
 import Safe, { SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
 import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
-import web3 from 'web3';
+import { useMoralis } from "react-moralis";
+
+
 
 export default function Gnosis() {
 
+  const [safeFactory, setSafeFactory] = useState("");
+  const [safe, setSafe] = useState("");
+  const [safeaddress, setSafeAddress] = useState("");
 
   const web3Provider = window.ethereum;
   //const web3Provider = web3.currentprovider;
   const provider = new ethers.providers.Web3Provider(web3Provider)
   //const provider = new ethers.providers.Web3Provider(web3Provider);
-  const safeOwner = provider.getSigner()
+  const safeOwner = provider.getSigner(0)
   const ethAdapter = new EthersAdapter({
   ethers,
   signer: safeOwner
   })
     const createSafe = async () =>{
-    const safeFactory =  await SafeFactory.create({ ethAdapter });
-    
-    const safeSdk =  await safeFactory.deploySafe({ safeAccountConfig });  
-    safeSdk();
+    const safeFactory =  await SafeFactory.create({ ethAdapter, safeaddress });
+    setSafeFactory(safeFactory());
+    const safeSdk : Safe =  await Safe.deploySafe({ safeAccountConfig });  
+    setSafe(safeSdk());
+    setSafeAddress(safeSdk.getAddress());
   }
   //const safeFactory = async () => await SafeFactory.create({ ethAdapter });
 
   const owners = ['0x9bfB07106c0Ce48B037aFb0757dd1C5eb94b20cA', '0x8Bc34a0823bFF3D1dF739E135aD2e332a9565C1b', '0x088006AFcD8130fd2AC61662c6c98E9B2e933Df3']
   const threshold = 3
-  const safeAccountConfig = {
+  const safeAccountConfig : SafeAccountConfig = {
   owners,
   threshold,
   };
@@ -54,48 +59,45 @@ export default function Gnosis() {
 
   const [contract, setContract] = useState(null);
 
-  const [safe, setSafe] = useState("");
+  //const [safe, setSafe] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
-  const [balance, setBalance] = useState(null);
+  const [balance, setBalance] = useState("");
 
-  const connectWalletHandler = () => {
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      window.ethereum
-        .request({ method: "eth_requestAccounts" })
-        .then((result) => {
-          accountChangedHandler(result[0]);
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-        });
-    } else {
-      console.log("Die Installation von MetaMask ist erforderlich");
-      setErrorMessage("Bitte installieren Sie die MetaMask-Browsererweiterung");
+  const { authenticate, isAuthenticated, isAuthenticating, user, account, logout } = useMoralis();
+
+    useEffect(() => {
+    if (isAuthenticated) {
+      // add your logic here
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
-  // update account, will cause component re-render
-  const accountChangedHandler = (newAccount) => {
-    if (connButtonText === "LOGOUT") {
-      setConnButtonText("LOGIN");
-      setDefaultAccount(null);
-    } else {
-      setConnButtonText("LOGOUT");
-      setDefaultAccount(newAccount);
-      updateEthers();
+    const login = async () => {
+      if (!isAuthenticated) {
+
+        await authenticate({signingMessage: "Log in using Moralis" })
+          .then(function (user) {
+            console.log("logged in user:", user);
+            console.log(user.get("ethAddress"));
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }
     }
-  };
 
-  const updateEthers = () => {
-    let tempProvider = new ethers.providers.Web3Provider(window.ethereum);
-  };
+    const logOut = async () => {
+      await logout();
+      console.log("logged out");
+    }
 
 
   return (
     <div>
-<ButtonAppBar onConnect={connectWalletHandler} text={connButtonText} />
+      <button onClick={login}>Moralis Metamask Login</button>
+      <button onClick={logOut} disabled={isAuthenticating}>Logout</button>
       <Box sx={{ flexGrow: 1 }} margin={2}>
-        {defaultAccount ? (
+        {isAuthenticated ? (
           <Grid
             container
             alignItems="flex-start"
@@ -115,8 +117,7 @@ export default function Gnosis() {
                   {" "}
                 Meine Wallet Adresse:
                 </Typography>
-
-                <Typography variant="h6">{defaultAccount}</Typography>
+                <Typography variant="h6">{user.get("ethAddress")}</Typography>
 
                 <Button
                   onClick={createSafe}
@@ -127,6 +128,7 @@ export default function Gnosis() {
                   Deploy Safe
                 </Button>
                 {errorMessage}
+                {safeaddress}
               </Card>
             </Grid>
           </Grid>
