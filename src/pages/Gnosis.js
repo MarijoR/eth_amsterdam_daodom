@@ -1,11 +1,11 @@
 import { React, useState, useEffect } from "react";
 import { Box, Button, Card, Grid, Typography } from "@mui/material";
 import { ethers } from 'ethers'
-import EthersAdapter from '@gnosis.pm/safe-core-sdk'
+import {EthersAdapter} from '@gnosis.pm/safe-core-sdk'
 import Safe, { SafeFactory, SafeAccountConfig } from '@gnosis.pm/safe-core-sdk'
-import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
+//import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
 import { useMoralis } from "react-moralis";
-
+import { ContractNetworksConfig } from '@gnosis.pm/safe-core-sdk'
 
 
 export default function Gnosis() {
@@ -14,27 +14,41 @@ export default function Gnosis() {
   const [safe, setSafe] = useState("");
   const [safeaddress, setSafeAddress] = useState("");
 
-  const web3Provider = window.ethereum;
+
+    const createSafe = async () =>{
+    console.log("test");
+
+    const web3Provider = window.ethereum;
+
   //const web3Provider = web3.currentprovider;
   const provider = new ethers.providers.Web3Provider(web3Provider)
   //const provider = new ethers.providers.Web3Provider(web3Provider);
-  const safeOwner = provider.getSigner(0)
-  const ethAdapter = new EthersAdapter({
-  ethers,
-  signer: safeOwner
-  })
-    const createSafe = async () =>{
+  const safeOwner = provider.getSigner(0);
+
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signer: safeOwner
+      })
+    const id = await ethAdapter.getChainId()
+
+    const safeSdk = await Safe.deploy({ ethAdapter, safeaddress})
     const safeFactory =  await SafeFactory.create({ ethAdapter, safeaddress });
     setSafeFactory(safeFactory());
-    const safeSdk : Safe =  await Safe.deploySafe({ safeAccountConfig });  
+    console.log("test2")
+    //const safeSdk  =  await Safe.deploySafe({ safeAccountConfig, });  
     setSafe(safeSdk());
+    console.log("test3")
     setSafeAddress(safeSdk.getAddress());
+    console.log(safeaddress);
+    console.log(safe);
   }
+
+
   //const safeFactory = async () => await SafeFactory.create({ ethAdapter });
 
   const owners = ['0x9bfB07106c0Ce48B037aFb0757dd1C5eb94b20cA', '0x8Bc34a0823bFF3D1dF739E135aD2e332a9565C1b', '0x088006AFcD8130fd2AC61662c6c98E9B2e933Df3']
   const threshold = 3
-  const safeAccountConfig : SafeAccountConfig = {
+  const safeAccountConfig  = {
   owners,
   threshold,
   };
@@ -117,7 +131,15 @@ export default function Gnosis() {
                   {" "}
                 Meine Wallet Adresse:
                 </Typography>
+
                 <Typography variant="h6">{user.get("ethAddress")}</Typography>
+
+                <Typography margin={3} variant="h5" color="#345DA7">
+                  {" "}
+                Meine Safe Adresse:
+                </Typography>
+                
+                <Typography variant="h6">{safeaddress}</Typography>
 
                 <Button
                   onClick={createSafe}
