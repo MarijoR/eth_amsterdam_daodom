@@ -2,8 +2,16 @@ import "../styles/BlogCard.css";
 // import { useNavigate } from "react-router-dom"; 
 import { Link, useHistory } from "react-router-dom";
 
+//neu
+import React from "react";
+import Moment from "moment";
+
 const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
   // const BlogCard = ({ name, description, ownerOf, externalUrl }) => {
+
+    const current = new Date();
+    const date = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
+    const dateToFormat = '1976-04-19';
   
   const length = 100;
   const trimmedString = text.length > 100 ? 
@@ -33,7 +41,9 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
       <div className="blog_leftSide">
       <div className="blogger">
           <span className="blogger_name">{account}</span>
-          <span className="blogger_date">Mar 21</span>
+          {/* <Moment> */}
+             <span className="blogger_date">date: {date} </span>
+          {/* </Moment> */}
       </div>
       <div className="blog_title">
           <h3>{title}</h3>

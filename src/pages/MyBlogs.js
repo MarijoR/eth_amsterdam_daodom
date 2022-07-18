@@ -89,13 +89,30 @@ const MyBlogs = () => {
     //  <Redirect to="/newStory" />
     history.push("/newStory");
   };
+
+  //neu hinzugefügt: (rerendering)
+  const [nfts, setNfts] = useState()
+
+  useEffect(() => {
+    const options2 = {
+      chain: "mumbai",
+      address: account,
+      token_address: "0x2fAB8F1113b1C14A25E9e018510B58bE7882CFB6",
+    };
+    const test = async () => {
+      // await Moralis.Web3API.account.getNFTs({ ... })
+      await Web3Api.account.getNFTsForContract(options2)
+        .then((data) => setNfts(data.result))
+    }
+    test()
+  })
  
 
   return (
     <>
       <div>
       <div className="myBlogsHeader">Your Blogs</div>
-        {blogsContent && blogsContent?.length > 0 ? (
+        { nfts && blogsContent && blogsContent?.length > 0 ? (
             blogsContent.map((blog, i) => {
               const { title, text, owner_of, externalUrl } = blog;
               return (

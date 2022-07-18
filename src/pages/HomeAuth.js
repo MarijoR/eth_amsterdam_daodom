@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import "../styles/HomeAuth.css"
 import axios from "axios";
 import BlogCard from "../components/BlogCard"
-import { useMoralisWeb3Api } from "react-moralis";
+import { useMoralisWeb3Api, useMoralis } from "react-moralis";
 
 const HomeAuth = () => {
+
+  //neu hinzugefügt: (rerendering)
+  const { account } = useMoralis();
 
   //für externalUrl siehe constants.js
   //vorher war zwischen den Klammern bei blogs das hier
@@ -74,11 +77,28 @@ const HomeAuth = () => {
     }
   }, [blogs]);
 
+  //neu hinzugefügt:
+  const [nfts, setNfts] = useState()
+
+  useEffect(() => {
+    const options2 = {
+      chain: "mumbai",
+      address: account,
+      token_address: "0x2fAB8F1113b1C14A25E9e018510B58bE7882CFB6",
+    };
+    const test = async () => {
+      // await Moralis.Web3API.account.getNFTs({ ... })
+      await Web3Api.account.getNFTsForContract(options2)
+        .then((data) => setNfts(data.result))
+    }
+    test()
+  })
+
   return (
     <div className="homeAuth_container">
       <div className="homeAuth_header">Recommended Blogs</div>
       <div className="homeAuth_blogs">
-        {blogsContent &&
+        { nfts && blogsContent &&
           blogsContent.map((blog, i) => {
             const { title, text, owner_of, externalUrl } = blog;
             // const { name, description, owner_of, externalUrl } = blog;
