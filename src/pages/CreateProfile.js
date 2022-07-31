@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "components/shared/form/Form";
 import Input from "components/shared/form/Input";
 import InputWrapper from "components/shared/form/InputWrapper";
@@ -13,6 +13,13 @@ import useStore from "store";
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
 
+import {
+  client,
+  recommendProfiles,
+  getPublications,
+  createProfil,
+} from "../api";
+
 export default function CreateProfile() {
   const user = useStore((s) => s.user);
   const {
@@ -23,6 +30,28 @@ export default function CreateProfile() {
   const [type, setType] = useState("text");
 
   function onSubmit(data) {}
+
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
+
+  async function fetchProfiles() {
+    try {
+      const response = await client.query(recommendProfiles).toPromise();
+      const profileData = await Promise.all(
+        response.data.recommendedProfiles.map(async (profile) => {
+          const pub = await client
+            .query(getPublications, { id: profile.id, limit: 1 })
+            .toPromise();
+          profile.publication = pub.data.publications.items[0];
+          return profile;
+        })
+      );
+      console.log("data:", profileData);
+    } catch (err) {
+      console.log("error fetching recommended profiles: ", err);
+    }
+  }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} wide>
@@ -67,7 +96,7 @@ export default function CreateProfile() {
         />
         <Error>{errors.address?.message}</Error>
       </InputWrapper>
-      <SubmitButton type="submit">create proposal</SubmitButton>
+      <SubmitButton type="submit">create profile</SubmitButton>
     </Form>
   );
 }
