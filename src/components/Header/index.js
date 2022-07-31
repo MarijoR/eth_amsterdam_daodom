@@ -7,7 +7,7 @@ import useStore from "store";
 import { useMutation } from "react-query";
 import { logOut } from "lib/firebase";
 import toast from "react-hot-toast";
-import shallow from "zustand/shallow"
+import shallow from "zustand/shallow";
 
 const Wrapper = styled.header`
   position: sticky;
@@ -34,38 +34,40 @@ const Wrapper = styled.header`
 `;
 
 export default function Header({ history }) {
-  const [user, resetUser] = useStore(s => [s.user, s.resetUser], shallow);
+  const [user, resetUser] = useStore((s) => [s.user, s.resetUser], shallow);
   const mutation = useMutation(logOut, {
     onSuccess: () => {
-      resetUser()
-      history.push('/login')
-      toast('Logged Out', {
-        icon: "bye"
-      })
-    }, 
+      resetUser();
+      history.push("/login");
+      toast("Logged Out", {
+        icon: "bye",
+      });
+    },
     onError: () => {
-      toast.error('Error logging out')
-    }
+      toast.error("Error logging out");
+    },
   });
 
-  return <Wrapper>
-    <HeaderLogo />
-    <HeaderDarkButton />
-    {user ? (
-      <>
-        {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
-        <HeaderNavLink  to="/multisig">My Gnosis Safe</HeaderNavLink>
-        <HeaderUsername username={user.username}/>
-        <HeaderNavLink to="/" onClick={mutation.mutate}>
-          log out
-        </HeaderNavLink>
-      </>
-    ) : (
-      <>
-        <HeaderNavLink  to="/login">log in</HeaderNavLink>
-        <HeaderNavLink  to="/signup">sign up</HeaderNavLink>
-
-      </>
-    )}
-  </Wrapper>;
+  return (
+    <Wrapper>
+      <HeaderLogo />
+      <HeaderDarkButton />
+      {user ? (
+        <>
+          {/* <HeaderNavLink  to="/createjob">contract</HeaderNavLink> */}
+          <HeaderNavLink to="/multisig">My Gnosis Safe</HeaderNavLink>
+          <HeaderNavLink to="/createprofile">Create Profil</HeaderNavLink>
+          <HeaderUsername username={user.username} />
+          <HeaderNavLink to="/" onClick={mutation.mutate}>
+            log out
+          </HeaderNavLink>
+        </>
+      ) : (
+        <>
+          <HeaderNavLink to="/login">log in</HeaderNavLink>
+          <HeaderNavLink to="/signup">sign up</HeaderNavLink>
+        </>
+      )}
+    </Wrapper>
+  );
 }
