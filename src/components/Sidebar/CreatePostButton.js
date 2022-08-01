@@ -9,12 +9,25 @@ const CreatePostButton = styled(Button)`
   text-align: center;
 `;
 
-const CreateBlogButton = styled(Button)`
+const CreateBlogButton = styled(Button)
+//das hier ist die Version zusammen mit dem oberen
+// `
+//   border-radius: 2px 2px 0 0;
+//   padding: 8px;
+//   text-decoration: none;
+//   text-align: center;
+// `;
+
+//das hier ist die Version als alleiniger Button
+`
+display: flex;
   border-radius: 2px 2px 0 0;
-  padding: 8px;
+  padding: 10px;
   text-decoration: none;
   text-align: center;
+  justify-content: center;
 `;
+
 
 
 export default function SidebarCreatePostButton() {
@@ -25,6 +38,9 @@ export default function SidebarCreatePostButton() {
     </CreatePostButton>
      <CreateBlogButton as={Link} to="/HomeAuth">
       create blog
+    </CreateBlogButton> 
+    <CreateBlogButton as={Link} to="/createblog">
+      create blog via IPFS 
     </CreateBlogButton> 
     </div>
   );

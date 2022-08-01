@@ -6,7 +6,7 @@ import { Link, useHistory } from "react-router-dom";
 import React from "react";
 import Moment from "moment";
 
-const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
+const BlogCard = ({ text, title, Category, Address, Flowrate, Url, time, ownerOf, externalUrl }) => {
   // const BlogCard = ({ name, description, ownerOf, externalUrl }) => {
 
     const current = new Date();
@@ -46,10 +46,14 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
           {/* </Moment> */}
       </div>
       <div className="blog_title">
-          <h3>{title}</h3>
+          <h3>Title: {title}</h3>
       </div>
       <div className="blog_content">
-          <p>{trimmedString}...</p>
+          <p>Text: {trimmedString}...</p>
+          <p>Category: {Category}</p>
+          <p>Flowrate: {Flowrate}</p>
+          <p>Eth-Address: {Address}</p>
+          <p>Date: {time}</p>
       </div>
       </div>
       <div className="blog_rightSide">
@@ -57,7 +61,7 @@ const BlogCard = ({ text, title, ownerOf, externalUrl }) => {
           <img
             className="blog_image"
             // src="https://ipfs.moralis.io:2053/ipfs/QmWEsG4ayh75BMk2H1CowAdALPjsi3fD7CSZ6qxNM1yNnz/image/moralis.png"
-            src="https://ipfs.moralis.io:2053/ipfs/QmXaRnHiDJGZuqSTKFU1aNcSiyRWJmAJGA4Koo3yrgJqMz/Goku"
+            // src="https://ipfs.moralis.io:2053/ipfs/QmXaRnHiDJGZuqSTKFU1aNcSiyRWJmAJGA4Koo3yrgJqMz/Goku"
             alt=""
           />
         </div>

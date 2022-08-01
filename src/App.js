@@ -17,6 +17,9 @@ import logo from "./images/chaincentive.png";
 import { useMoralis } from "react-moralis";
 import { ConnectButton } from "web3uikit";
 import "./styles/App.css";
+import CreateBlog from "pages/CreateBlog";
+import PostListIPFS from "pages/PostListIPFS";
+import HomeIPFS from "pages/HomeIPFS";
 
 export default function App() {
   useAuthUser();
@@ -70,7 +73,10 @@ export default function App() {
     {/* <Route path="/createjob" component={CreateFlow} /> */}
     <Route path="/multisig" component={MultiSigGnosis} />
     <Route path="/createpost" component={CreatePost} />
+    <Route path="/createblog" component={CreateBlog} />
+    {/* <Route path="/postlistipfs" component={PostListIPFS} /> */}
     <Route path="/" component={Home} />
+    {/* <Route path="/" component={HomeIPFS} /> */}
     </Switch>
     {/* <> */}
     {isAuthenticated ? (
@@ -87,7 +93,7 @@ export default function App() {
     </Switch>
     </div>
           <div className="rightBar">
-            <Rightbar />
+            {/* <Rightbar /> */}
           </div>
         </div>
    ) : (

@@ -68,6 +68,7 @@ const NewStory = () => {
       await mint(account, nftResult.ipfs());
     } catch (error) {
       alert(error.message);
+      console.log(error.message);
     }
 
   }

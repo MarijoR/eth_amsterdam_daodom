@@ -40,7 +40,7 @@ export default function PostList() {
 
   return (<List>
     {posts.map(post => (
-      <PostListItem key={post.id} post={post} />
+      <PostListItem key={post.id}  />
     ))}
   </List>
   )

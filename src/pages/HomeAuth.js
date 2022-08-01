@@ -33,7 +33,8 @@ const HomeAuth = () => {
       if (metadata) {
         const metadataObj = JSON.parse(metadata);
         const { externalUrl } = metadataObj;
-        return { externalUrl, owner_of };
+        const { text } = metadataObj;
+        return { externalUrl, owner_of, text };
       } else {
         return undefined;
       }
@@ -50,20 +51,30 @@ const HomeAuth = () => {
     if (limit5) {
       limit5.map(async (blog) => {
         if (blog) {
-          const { externalUrl, owner_of } = blog;
+          const { externalUrl, owner_of, } = blog;
           const res = await axios.get(externalUrl);
           const text = res.data.text.toString();
           // const name = res.data.text.toString();
           const title = res.data.title;
           // const description = res.data.description;
-          contentBlog.push({ title, text, owner_of, externalUrl });
+          const Category = res.data.Category;
+          const Address = res.data.Address;
+          const Flowrate = res.data.Flowrate;
+          const Url = res.data.Url;
+          const time = res.data.time;
+          // contentBlog.push({ title, text, owner_of, externalUrl });
           // contentBlog.push({ name, description, owner_of, externalUrl });
+          contentBlog.push({ title, text,  Category, Address, Flowrate, Url, time, owner_of, externalUrl  });
         }
       });
     }
     setBlogsContent(contentBlog);
-    
   }
+
+  // console.log(blogsContent)
+  // console.log(blogsContent[1].title)
+  // console.log("Text in line 4", blogsContent[4].text)
+  // console.log(blogs)
 
   useEffect(() => {
     if (blogs && !blogsContent) {
@@ -96,17 +107,26 @@ const HomeAuth = () => {
 
   return (
     <div className="homeAuth_container">
-      <div className="homeAuth_header">Recommended Blogs</div>
+      <div className="homeAuth_header">View All User-Blogs</div>
+      {/* {nfts && blogsContent && <div>Text: {blogsContent[1].title}</div>} */}
+      {/* {nfts && blogsContent && <div>Text: {blogsContent[1].text}</div>} */}
       <div className="homeAuth_blogs">
-        { nfts && blogsContent &&
+        { nfts && blogsContent && 
           blogsContent.map((blog, i) => {
-            const { title, text, owner_of, externalUrl } = blog;
+            // const { title, text, owner_of, externalUrl } = blog;
             // const { name, description, owner_of, externalUrl } = blog;
+            const { title, text,  Category, Address, Flowrate, Url, time, owner_of, externalUrl } = blog;
             return (
               <BlogCard
                 key={i}
-                title={title}
+                // title={title}
+                title={blog.title} //kann man auch so schreiben
                 text={text}
+                Category={Category}
+                Address={Address}
+                Flowrate={Flowrate}
+                Url={Url}
+                time={time}
                 // name={name}
                 // description={description}
                 ownerOf={owner_of}
@@ -117,6 +137,8 @@ const HomeAuth = () => {
       </div>
     </div>
   );
+
+  
 };
 
 export default HomeAuth;
