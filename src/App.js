@@ -74,9 +74,9 @@ export default function App() {
     <Route path="/multisig" component={MultiSigGnosis} />
     <Route path="/createpost" component={CreatePost} />
     <Route path="/createblog" component={CreateBlog} />
-    {/* <Route path="/postlistipfs" component={PostListIPFS} /> */}
-    <Route path="/" component={Home} />
-    {/* <Route path="/" component={HomeIPFS} /> */}
+    <Route path="/postlistipfs" component={PostListIPFS} />
+    {/* <Route path="/" component={Home} /> */}
+    <Route path="/" component={HomeIPFS} />
     </Switch>
     {/* <> */}
     {isAuthenticated ? (

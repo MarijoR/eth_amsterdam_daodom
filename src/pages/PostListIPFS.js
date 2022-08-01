@@ -33,14 +33,14 @@ const Item = styled.li`
 
 
 export default function PostListIPFS({ text, title, Category, Address, Flowrate, Url, time, ownerOf, externalUrl }) {
-  const { username, category } = useParams()
-  const { data: posts, isLoading } = useQuery(["posts", username, category], () => {
-    return username 
-    ? getPostsByUsername(username) 
-    : category 
-    ? getPostsByCategory(category) 
-    : getPosts();
-  })
+  // const { username, category } = useParams()
+  // const { data: posts, isLoading } = useQuery(["posts", username, category], () => {
+  //   return username 
+  //   ? getPostsByUsername(username) 
+  //   : category 
+  //   ? getPostsByCategory(category) 
+  //   : getPosts();
+  // })
 
 
 
@@ -166,10 +166,10 @@ export default function PostListIPFS({ text, title, Category, Address, Flowrate,
 //               />
 //             );
 //           })}
-//     {/* {posts.map(post => (
+//     {posts.map(post => (
 //       <PostListItem 
 //       key={post.id} post={post} />
-//     ))} */}
+//     ))}
 //   </List>
 //   )
 // }

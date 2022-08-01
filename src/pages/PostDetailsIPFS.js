@@ -477,19 +477,19 @@ async function deleteFlow(currentAccount, recipient) {
         
     return (
       <Wrapper round={!user}>
-         {/* { nfts && blogsContent && */}
+         { nfts && blogsContent &&
         <span>
          <p>Recipient: 
             {/* {Address} */}
-            {/* {blogsContent[1].Address} */}
+            {blogsContent[1].Address}
             </p> 
               <p>Flow Rate: 
             {/* {Flowrate} */}
-            {/* {blogsContent[1].Flowrate} */}
+            {blogsContent[1].Flowrate}
             </p>  
           <p>This flow is equal to: {flowRateDisplay} DAIx/month</p>
-        </span>  
-        {/* } */}
+        </span> 
+             } 
         {/* {isAuthor && <DeleteButton onClick={() => mutation.mutate(postId)} />} */}
         <StreamButton onClick={handleStream} />
 
