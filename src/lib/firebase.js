@@ -239,3 +239,9 @@ export async function toggleVote(vote) {
     }
   });
 }
+
+export async function createSafe(user, safeaddress) {
+  const usersafe = collection(db, "users", user.uid);
+  const newSafe = usersafe.update(safeaddress);
+  return newSafe;
+}
